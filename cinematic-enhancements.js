@@ -71,7 +71,7 @@
   window.dogCmd = function(command){
     const st=H();
     if(command==="ثبت" && st && st.active){
-      if(typeof tracking!=="undefined" && tracking>=50){
+      if(st.tracking>=50){
         const wildlifeByArea={"ذيبين":["حجل","أرنب بري","حمام بري","ثعلب"],"جبل العرب":["حجل","أرنب بري","ثعلب","غزال"],"اللجاة الشرقية":["حجل","أرنب بري","ثعلب"],"البادية":["غزال","أرنب بري","ثعلب","ذئب"],"الجزيرة":["أرنب بري","حمام بري","ثعلب"]}; const pool=wildlifeByArea[st.state.area]||st.prey; hiddenSpecies=pool[Math.floor(Math.random()*pool.length)];
         originalDogCmd(command);
         if((typeof animal!=="undefined"&&animal)){
