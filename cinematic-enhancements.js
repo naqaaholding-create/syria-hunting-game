@@ -7,6 +7,8 @@
   const originalDogCmd = window.dogCmd;
   const originalStartTrip = window.startTrip;
   let hiddenSpecies = null;
+  let preySpeed = 0.018;
+  let preyFleeing = false;
   let weatherParticles = null;
   let cinematicCamera = null;
   let cinematicUntil = 0;
@@ -85,7 +87,7 @@
     const name=hiddenSpecies || "حيوان بري";
     const reward=name==="غزال"?950:name==="ذئب"?600:420;
     s.coins+=reward; save();
-    found=false; hiddenSpecies=null;
+    found=false; preyFleeing=true; hiddenSpecies=null;
     if(animal) animal.visible=false;
     film("لحظة الحسم","تم التعرف على الطريدة عند الاقتراب: "+name,3.2,"discovery");
     document.getElementById("msg").textContent="تمت إصابة "+name+" بنجاح. النتيجة محفوظة.";
@@ -132,6 +134,10 @@
         const remain=cinematicUntil-now;
         if(remain>0){
           if(animal && animal.visible){
+            if(preyFleeing){
+              animal.position.x += Math.sin(now*.0021)*preySpeed;
+              animal.position.z += Math.cos(now*.0017)*preySpeed;
+            }
             cinematicCamera.target.lerp(animal.position,.04);
             cam.lookAt(cinematicCamera.target.x,cinematicCamera.target.y+0.5,cinematicCamera.target.z);
           }
