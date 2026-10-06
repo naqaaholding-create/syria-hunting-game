@@ -125,12 +125,17 @@ bindJourneyAutosave();
 
 
 
+
+function playerProgress(){try{return JSON.parse(localStorage.getItem('playerProgress')||'{"level":1,"xp":0,"coins":0}')}catch(e){return {level:1,xp:0,coins:0}}}
+function savePlayerProgress(v){try{localStorage.setItem('playerProgress',JSON.stringify(v))}catch(e){}}
+function grantMissionReward(){const m=missionState();if(!m.completed||m.rewarded)return;const p=playerProgress();p.xp+=100;p.coins+=50;while(p.xp>=p.level*250){p.xp-=p.level*250;p.level++;}m.rewarded=true;savePlayerProgress(p);saveMission(m);if(typeof s!=='undefined')s.coins=p.coins;const el=document.getElementById('msg');if(el)el.textContent='🏆 مكافأة المهمة: +50 قطعة و +100 خبرة';}
+
 function missionState(){try{return JSON.parse(localStorage.getItem('journeyMission')||'{"type":"explore","progress":0,"target":3}')}catch(e){return {type:'explore',progress:0,target:3}}}
 function saveMission(v){try{localStorage.setItem('journeyMission',JSON.stringify(v))}catch(e){}}
 
-function advanceMission(amount){const v=missionState();v.progress=Math.min(v.target,v.progress+(amount||1));saveMission(v);if(v.progress>=v.target){v.completed=true;const m=document.getElementById('msg');if(m)m.textContent='🏆 اكتملت المهمة!';}updateMission();}
+function advanceMission(amount){const v=missionState();v.progress=Math.min(v.target,v.progress+(amount||1));saveMission(v);if(v.progress>=v.target){v.completed=true;const m=document.getElementById('msg');if(m)m.textContent='🏆 اكتملت المهمة!';grantMissionReward();}updateMission();}
 
-function updateMission(){const v=missionState();const m=document.getElementById('missionHud');if(m)m.textContent='🎯 المهمة: '+v.progress+'/'+v.target;}
+function updateMission(){const v=missionState();const m=document.getElementById('missionHud');if(m)m.textContent='🎯 المهمة: '+v.progress+'/'+v.target;const p=playerProgress();const h=document.getElementById('progressHud');if(h)h.textContent='⭐ مستوى '+p.level+' • XP '+p.xp;}
 
 function journeyStats(){try{return JSON.parse(localStorage.getItem('journeyStats')||'{"trips":0,"discoveries":0,"hits":0}')}catch(e){return {trips:0,discoveries:0,hits:0}}}
 function saveJourneyStats(v){try{localStorage.setItem('journeyStats',JSON.stringify(v))}catch(e){}}
