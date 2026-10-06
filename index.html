@@ -234,6 +234,12 @@ joy.addEventListener("pointerdown",e=>{active=true;joy.setPointerCapture(e.point
 joy.addEventListener("pointermove",move);joy.addEventListener("pointerup",end);joy.addEventListener("pointercancel",end);
 joy.style.display="block";
 }
+function makePlayer(){
+const g=new THREE.Group();
+const body=new THREE.Mesh(new THREE.BoxGeometry(.65,1.05,.38),new THREE.MeshStandardMaterial({color:0x344535,roughness:.95}));body.position.y=1.05;g.add(body);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),new THREE.MeshStandardMaterial({color:0xb98768}));head.position.y=1.78;g.add(head);
+for(const x of[-.19,.19]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.16,.7,.2),new THREE.MeshStandardMaterial({color:0x222923}));leg.position.set(x,.35,0);g.add(leg)}
+const w=new THREE.Group();const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.85,8),new THREE.MeshStandardMaterial({color:0x252525,metalness:.5}));barrel.rotation.z=Math.PI/2;barrel.position.set(.48,1.35,-.04);w.add(barrel);const stock=new THREE.Mesh(new THREE.BoxGeometry(.38,.13,.13),new THREE.MeshStandardMaterial({color:0x5a3d25}));stock.position.set(.2,1.2,-.04);w.add(stock);g.add(w);weapon=w;g.position.set(0,0,4);return g}
 function init3D(){
 scene=new THREE.Scene();scene.fog=new THREE.Fog(0x91a77f,35,150);
 cam=new THREE.PerspectiveCamera(68,1,.05,300);cam.position.set(0,2.1,7);
@@ -244,7 +250,7 @@ const sun=new THREE.DirectionalLight(0xfff2c7,2.2);sun.position.set(20,35,10);su
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180,30,30),new THREE.MeshStandardMaterial({color:0x314b2d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 for(let i=0;i<85;i++)makeTree((Math.random()-.5)*150,(Math.random()-.5)*130);
 makeRocks();
-dog=makeDog();scene.add(dog);
+dog=makeDog();player=makePlayer();scene.add(player);scene.add(dog);
 preyObj=makePrey();scene.add(preyObj);preyObj.visible=false;
 window.addEventListener("resize",resize);resize();animate();
 renderer.domElement.addEventListener("pointerdown",e=>{touch.x=e.clientX;touch.y=e.clientY});
@@ -254,7 +260,7 @@ function makeTree(x,z){const g=new THREE.Group();const trunk=new THREE.Mesh(new 
 function makeRocks(){for(let i=0;i<35;i++){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.35+Math.random()*.6,0),new THREE.MeshStandardMaterial({color:0x626858,roughness:1}));m.position.set((Math.random()-.5)*140,.3,(Math.random()-.5)*120);m.rotation.set(Math.random(),Math.random(),Math.random());scene.add(m)}}
 function makeDog(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x5a3420});const body=new THREE.Mesh(new THREE.BoxGeometry(1.2,.7,.55),mat);body.position.y=.8;g.add(body);const head=new THREE.Mesh(new THREE.BoxGeometry(.55,.5,.5),mat);head.position.set(.75,1.05,0);g.add(head);for(const x of [-.4,.4])for(const z of [-.2,.2]){const l=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,.55,6),mat);l.position.set(x,.4,z);g.add(l)}g.position.set(1,0,1);return g}
 function makePrey(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x8f8050});const b=new THREE.Mesh(new THREE.SphereGeometry(.38,12,8),mat);b.scale.set(1.5,.9,1);b.position.y=.7;g.add(b);const h=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),mat);h.position.set(.55,.85,0);g.add(h);g.position.set(-4,0,-10);return g}
-function resetField(){if(dog){dog.position.set(1,0,1);dog.rotation.y=0}if(preyObj){preyObj.visible=false}}
+function resetField(){if(dog){dog.position.set(1,0,1);dog.rotation.y=0}if(player){player.position.set(0,0,4)}if(preyObj){preyObj.visible=false}}
 function animate(){
 requestAnimationFrame(animate);
 movePlayer();
@@ -277,7 +283,7 @@ const speed=.11;let f=0,s=0;
 if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)s=-1;if(keys.d||keys.ArrowRight)s=1;
 f+=-moveInput.y;s+=moveInput.x;
 const moving=Math.abs(f)+Math.abs(s)>.08;
-if(moving){cam.translateZ(-f*speed);cam.translateX(s*speed);cam.position.y=2.1;const now=performance.now();if(now-lastStep>650){lastStep=now;document.getElementById("log").textContent="خطوات الصياد تتغير مع سرعة الحركة…"}}
+if(moving&&tripActive){cam.translateZ(-f*speed);cam.translateX(s*speed);cam.position.y=2.1;if(player){player.position.x=cam.position.x;player.position.z=cam.position.z+3.8;player.rotation.y=cam.rotation.y}const now=performance.now();if(now-lastStep>650){lastStep=now;document.getElementById("log").textContent="خطوات الصياد تتغير مع سرعة الحركة…"}}
 }
 window.addEventListener("keydown",e=>keys[e.key]=true);window.addEventListener("keyup",e=>keys[e.key]=false);
 function resize(){const w=document.getElementById("canvasWrap").clientWidth,h=document.getElementById("canvasWrap").clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();renderer.setSize(w,h)}
