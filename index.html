@@ -116,6 +116,9 @@ window.addEventListener("keydown",e=>keys[e.key]=true);window.addEventListener("
 function animate(){requestAnimationFrame(animate);let f=0,x=0;if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)x=-1;if(keys.d||keys.ArrowRight)x=1;f-=joy.y;x+=joy.x;if(active){cam.translateZ(-f*.11);cam.translateX(x*.11);player.position.set(cam.position.x,0,cam.position.z+3.8);player.rotation.y=cam.rotation.y;dog.position.x+=(cam.position.x+1-dog.position.x)*.04;dog.position.z+=(cam.position.z+1.7-dog.position.z)*.04}if(animal.visible){animal.position.x+=(animalTarget.x-animal.position.x)*.003;animal.position.z+=(animalTarget.z-animal.position.z)*.003}renderer.render(scene,cam)}
 function wildlifeForArea(){const m={"ذيبين":["حجل","أرنب بري","حمام بري","ثعلب"],"جبل العرب":["حجل","أرنب بري","ثعلب","غزال"],"اللجاة الشرقية":["حجل","أرنب بري","ثعلب"],"اللجاة":["حجل","أرنب بري","ثعلب"],"البادية":["غزال","أرنب بري","ثعلب","ذئب"],"الجزيرة":["أرنب بري","حمام بري","ثعلب"]};return m[s.area]||prey}
 
+
+function resetJourneyData(){try{localStorage.removeItem('journeyHuntPro');localStorage.removeItem('journeyFieldPos');location.reload();}catch(e){}}
+
 function saveJourneyState(){try{localStorage.setItem('journeyHuntPro',JSON.stringify({region:s.region,area:s.area,dog:s.dog,ammo:ammo,stamina:stamina,coins:s.coins||0}));}catch(e){}}
 function loadJourneyState(){try{const v=JSON.parse(localStorage.getItem('journeyHuntPro')||'null');if(!v)return;if(v.region)s.region=v.region;if(v.area)s.area=v.area;if(v.dog)s.dog=v.dog;if(Number.isFinite(v.coins))s.coins=v.coins;}catch(e){}}
 
