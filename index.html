@@ -22,7 +22,7 @@ h2{font-size:25px}
 button{border:0;border-radius:13px;padding:12px;min-height:45px;background:#dec76b;color:#111;font-weight:bold;margin-top:7px}
 button.alt{background:#26392b;color:#fff;border:1px solid #51634d}
 button.selected{outline:2px solid #e3cb70}
-nav{position:fixed;bottom:0;left:0;right:0;background:#06100a;border-top:1px solid #40523d;display:grid;grid-template-columns:repeat(6,1fr);z-index:10}
+nav{position:fixed;bottom:0;left:0;right:0;background:#06100a;border-top:1px solid #40523d;display:grid;grid-template-columns:repeat(7,1fr);z-index:10}
 nav button{background:transparent;color:#aeb8aa;border-radius:0;margin:0;font-size:10px}
 nav button.active{background:#19291c;color:#e1ca70}
 .scene{height:420px;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(#779064 0 35%,#4e6849 36% 58%,#243b25 59%)}
@@ -44,7 +44,10 @@ nav button.active{background:#19291c;color:#e1ca70}
 
 <header>
 <b class="gold">🏔️ رحلة الصيد السورية</b>
+<div style="display:flex;gap:8px;align-items:center">
+<button class="alt" style="margin:0;padding:8px 10px;min-height:38px" onclick="show('admin')">⚙️ الإدارة</button>
 <b>🪙 <span id="money">1000</span></b>
+</div>
 </header>
 
 <main>
@@ -173,6 +176,47 @@ nav button.active{background:#19291c;color:#e1ca70}
 </div>
 </section>
 
+
+<section id="admin" class="page">
+<h2>⚙️ لوحة الإدارة</h2>
+<p class="small">نسخة اختبارية — الإدارة المالية هنا محاكاة محلية فقط، ولا تنفذ تحويلات مالية حقيقية.</p>
+
+<div class="grid4">
+<div class="card"><span class="small">الإيراد الإجمالي</span><h2 class="gold"><span id="grossRevenue">0</span> USDT</h2></div>
+<div class="card"><span class="small">التكاليف</span><h2><span id="costs">0</span> USDT</h2></div>
+<div class="card"><span class="small">صافي الإيراد</span><h2 class="gold"><span id="netRevenue">0</span> USDT</h2></div>
+<div class="card"><span class="small">صندوق اللاعبين 20%</span><h2 class="gold"><span id="playerFund">0</span> USDT</h2></div>
+</div>
+
+<div class="card">
+<h3>💰 قاعدة توزيع اللاعبين</h3>
+<p>20% من <b>صافي الإيراد المؤهل</b> يخصص لصندوق جوائز اللاعبين.</p>
+<div class="row"><span>موزع</span><b id="distributed">0 USDT</b></div>
+<div class="row"><span>طلبات سحب معلقة</span><b id="pendingWithdrawals">0 USDT</b></div>
+<div class="row"><span>المتبقي بالصندوق</span><b id="fundRemaining">0 USDT</b></div>
+</div>
+
+<div class="card">
+<h3>🛡️ SafePal</h3>
+<p class="small">SafePal هو المحفظة الوحيدة المعتمدة في الخطة. الربط الآلي غير مفعل في هذه النسخة.</p>
+<div class="row"><span>حالة المحفظة</span><b class="gold">جاهزة للتحويل اليدوي</b></div>
+<div class="row"><span>الحد الأدنى للسحب</span><b>5 USDT</b></div>
+</div>
+
+<div class="card">
+<h3>📋 نموذج مالي تجريبي</h3>
+<div class="grid">
+<label>الإيراد الإجمالي<br><input id="adminGross" type="number" min="0" step="0.01" value="10000" style="width:100%;padding:12px;border-radius:10px"></label>
+<label>التكاليف<br><input id="adminCosts" type="number" min="0" step="0.01" value="0" style="width:100%;padding:12px;border-radius:10px"></label>
+</div>
+<button onclick="updateAdminFinance()">تحديث الحسابات</button>
+</div>
+
+<div class="card">
+<h3>🔐 سير عملية السحب</h3>
+<p>طلب اللاعب → مراجعة مكافحة الاحتيال → موافقة المدير → تحويل يدوي من SafePal → تسجيل TXID → إغلاق الطلب.</p>
+</div>
+</section>
 </main>
 
 
@@ -183,6 +227,7 @@ nav button.active{background:#19291c;color:#e1ca70}
 <button id="nav-dogs" onclick="show('dogs')">🐕<br>الكلاب</button>
 <button id="nav-equipment" onclick="show('equipment')">🎒<br>المعدات</button>
 <button id="nav-setup" onclick="show('setup')">🎯<br>الصيد</button>
+<button id="nav-admin" onclick="show('admin')">⚙️<br>الإدارة</button>
 </nav>
 
 <div id="toast" class="toast"></div>
@@ -576,6 +621,49 @@ show("home");
 }
 
 
+
+let adminFinance=JSON.parse(localStorage.getItem("syriaAdminFinance"))||{
+gross:10000,costs:0,distributed:0,pending:0
+};
+
+function updateAdminFinance(){
+const gross=Math.max(0,Number(document.getElementById("adminGross").value)||0);
+const costs=Math.max(0,Number(document.getElementById("adminCosts").value)||0);
+adminFinance.gross=gross;
+adminFinance.costs=Math.min(costs,gross);
+localStorage.setItem("syriaAdminFinance",JSON.stringify(adminFinance));
+refreshAdminFinance();
+toast("تم تحديث الحسابات");
+}
+
+function refreshAdminFinance(){
+const gross=Math.max(0,adminFinance.gross||0);
+const costs=Math.min(Math.max(0,adminFinance.costs||0),gross);
+const net=Math.max(0,gross-costs);
+const fund=net*0.20;
+const distributed=Math.max(0,adminFinance.distributed||0);
+const pending=Math.max(0,adminFinance.pending||0);
+const remaining=Math.max(0,fund-distributed-pending);
+
+const ids={
+grossRevenue:gross.toFixed(2),
+costs:costs.toFixed(2),
+netRevenue:net.toFixed(2),
+playerFund:fund.toFixed(2),
+distributed:distributed.toFixed(2)+" USDT",
+pendingWithdrawals:pending.toFixed(2)+" USDT",
+fundRemaining:remaining.toFixed(2)+" USDT"
+};
+Object.entries(ids).forEach(([id,v])=>{
+const el=document.getElementById(id);
+if(el)el.textContent=v;
+});
+const g=document.getElementById("adminGross");
+const k=document.getElementById("adminCosts");
+if(g)g.value=gross;
+if(k)k.value=costs;
+}
+
 function refresh(){
 
 document.getElementById("money").textContent=state.money;
@@ -665,6 +753,7 @@ s[1]+" 🪙</button>"+
 }
 
 refresh();
+refreshAdminFinance();
 
 </script>
 </body>
