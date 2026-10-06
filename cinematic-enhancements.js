@@ -5,6 +5,7 @@
 */
 (function(){
   const originalDogCmd = window.dogCmd;
+  const H=()=>window.__huntState||null;
   const originalStartTrip = window.startTrip;
   let hiddenSpecies = null;
   let preySpeed = 0.018;
@@ -58,25 +59,27 @@
   };
 
   window.startTrip = function(){
-    if(!s.region || !s.area){ toast("حدد المحافظة والمنطقة أولًا"); show("tripView","navTrip"); return; }
+    const st=H();
+    if(!st || !st.state.region || !st.state.area){ toast("حدد المحافظة والمنطقة أولًا"); show("tripView","navTrip"); return; }
     hiddenSpecies=null;
     originalStartTrip();
     setTimeout(()=>{
-      film("الوصول إلى "+s.area, s.region+" • وقت محلي حي • مراقبة الرياح والضوء",4.0,"arrival");
+      film("الوصول إلى "+st.state.area, st.state.region+" • وقت محلي حي • مراقبة الرياح والضوء",4.0,"arrival");
     },80);
   };
 
   window.dogCmd = function(command){
-    if(command==="ثبت" && typeof active!=="undefined" && active){
+    const st=H();
+    if(command==="ثبت" && st && st.active){
       if(typeof tracking!=="undefined" && tracking>=50){
-        const wildlifeByArea={"ذيبين":["حجل","أرنب بري","حمام بري","ثعلب"],"جبل العرب":["حجل","أرنب بري","ثعلب","غزال"],"اللجاة الشرقية":["حجل","أرنب بري","ثعلب"],"البادية":["غزال","أرنب بري","ثعلب","ذئب"],"الجزيرة":["أرنب بري","حمام بري","ثعلب"]}; const pool=wildlifeByArea[s.area]||prey; hiddenSpecies=pool[Math.floor(Math.random()*pool.length)];
+        const wildlifeByArea={"ذيبين":["حجل","أرنب بري","حمام بري","ثعلب"],"جبل العرب":["حجل","أرنب بري","ثعلب","غزال"],"اللجاة الشرقية":["حجل","أرنب بري","ثعلب"],"البادية":["غزال","أرنب بري","ثعلب","ذئب"],"الجزيرة":["أرنب بري","حمام بري","ثعلب"]}; const pool=wildlifeByArea[st.state.area]||st.prey; hiddenSpecies=pool[Math.floor(Math.random()*pool.length)];
         originalDogCmd(command);
         if((typeof animal!=="undefined"&&animal)){
           animal.visible=true;
           animal.scale.setScalar(hiddenSpecies==="غزال"?1.8:hiddenSpecies==="ذئب"?1.25:1);
         }
-        document.getElementById("msg").textContent=s.dog+" ثبت على أثر حي. اقترب بحذر؛ نوع الطريدة مخفي حتى لحظة الاقتراب.";
-        film("اكتشاف الأثر",s.dog+" ثبت في المكان… هناك حركة في الأمام.",3.5,"discovery");
+        document.getElementById("msg").textContent=st.state.dog+" ثبت على أثر حي. اقترب بحذر؛ نوع الطريدة مخفي حتى لحظة الاقتراب.";
+        film("اكتشاف الأثر",st.state.dog+" ثبت في المكان… هناك حركة في الأمام.",3.5,"discovery");
         return;
       }
     }
@@ -84,11 +87,14 @@
   };
 
   window.fire = function(){
-    if(!found){ toast("لا توجد طريدة مكتشفة"); return; }
+    const st=H();
+    if(!st || !st.found){ toast("لا توجد طريدة مكتشفة"); return; }
+    if(st.ammo<=0){ toast("انتهت الذخيرة"); return; }
+    st.ammo--;
     const name=hiddenSpecies || "حيوان بري";
     const reward=name==="غزال"?950:name==="ذئب"?600:420;
-    s.coins+=reward; save();
-    found=false; if(typeof advanceMission==='function')advanceMission(1); preyFleeing=true; preyFleeVector={x:(Math.random()-.5)*2,z:(Math.random()-.5)*2}; preySpeed=hiddenSpecies==='غزال'?0.075:(hiddenSpecies==='أرنب بري'?0.095:(hiddenSpecies==='ثعلب'?0.055:0.045)); hiddenSpecies=null;
+    st.state.coins+=reward; save();
+    st.found=false; if(typeof advanceMission==='function')advanceMission(1); preyFleeing=true; preyFleeVector={x:(Math.random()-.5)*2,z:(Math.random()-.5)*2}; preySpeed=hiddenSpecies==='غزال'?0.075:(hiddenSpecies==='أرنب بري'?0.095:(hiddenSpecies==='ثعلب'?0.055:0.045)); hiddenSpecies=null;
     if(animal) animal.visible=false;
     film("لحظة الحسم","تم التعرف على الطريدة عند الاقتراب: "+name,3.2,"discovery");
     document.getElementById("msg").textContent="تمت إصابة "+name+" بنجاح. النتيجة محفوظة.";
