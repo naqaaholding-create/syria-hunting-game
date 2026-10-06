@@ -263,6 +263,7 @@ function makePrey(){const g=new THREE.Group();const mat=new THREE.MeshStandardMa
 function resetField(){if(dog){dog.position.set(1,0,1);dog.rotation.y=0}if(player){player.position.set(0,0,4)}if(preyObj){preyObj.visible=false}}
 function animate(){
 requestAnimationFrame(animate);
+if(tripActive&&tripStartedAt&&Date.now()-tripStartedAt>2700000){document.getElementById("returnBtn").style.display="block";document.getElementById("log").textContent="مر وقت طويل في الميدان. يُفضّل العودة قبل حلول الليل."}
 movePlayer();
 updateEnvironment();
 if(dog){
@@ -273,8 +274,9 @@ dog.rotation.y=Math.atan2(dx,dz);
 if(preyObj&&preyObj.visible){
 const dx=preyObj.position.x-animalTarget.x,dz=preyObj.position.z-animalTarget.z;
 if(Math.hypot(dx,dz)<1){animalTarget.x=(Math.random()-.5)*45;animalTarget.z=(Math.random()-.5)*45}
-preyObj.position.x+=(animalTarget.x-preyObj.position.x)*.002;
-preyObj.position.z+=(animalTarget.z-preyObj.position.z)*.002;
+preyObj.position.x+=(animalTarget.x-preyObj.position.x)*.003;
+preyObj.position.z+=(animalTarget.z-preyObj.position.z)*.003;
+preyObj.rotation.y=Math.atan2(animalTarget.x-preyObj.position.x,animalTarget.z-preyObj.position.z);
 }
 renderer.render(scene,cam)
 }
@@ -298,12 +300,12 @@ if(c==="ثبت"){if(hunt.tracking<50){document.getElementById("log").textContent
 hunt.tracking=Math.min(90,hunt.tracking)
 }
 function discover(){
-hunt.prey=prey[Math.floor(Math.random()*prey.length)];hunt.found=true;preyObj.visible=true;
+hunt.prey=prey[Math.floor(Math.random()*prey.length)];hunt.found=true;preyObj.visible=true;animalTarget.x=preyObj.position.x+(Math.random()-.5)*18;animalTarget.z=preyObj.position.z+(Math.random()-.5)*18;
 preyObj.position.set(cam.position.x-4,0,cam.position.z-12);animalTarget.x=preyObj.position.x+(Math.random()-.5)*18;animalTarget.z=preyObj.position.z+(Math.random()-.5)*18;
 document.getElementById("shootBtn").style.display="block";
 document.getElementById("log").textContent=state.dog+" ثبت على حركة قريبة. الطريدة تتحرك في الميدان ولا تظهر مسبقًا.";
 }
-function shoot(){if(!hunt.found)return;const dist=cam.position.distanceTo(preyObj.position);const chance=Math.max(.25,Math.min(.9,.72-dist*.025));if(Math.random()<chance){document.getElementById("log").textContent="تمت إصابة "+hunt.prey+" في "+state.area+".";state.coins+=hunt.prey==="غزال"?950:420;save();hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none"}else{document.getElementById("log").textContent="أخطأت الطريدة وهربت. على الكلب إعادة التتبع.";hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none";hunt.tracking=0}}
+function shoot(){if(!hunt.found)return;if((state.ammo||0)<=0){document.getElementById("log").textContent="انتهت الذخيرة.";return}state.ammo--;if(weapon){weapon.rotation.z=-.12;setTimeout(()=>weapon.rotation.z=0,100)}save();const dist=cam.position.distanceTo(preyObj.position);const chance=Math.max(.25,Math.min(.9,.72-dist*.025));if(Math.random()<chance){document.getElementById("log").textContent="تمت إصابة "+hunt.prey+" في "+state.area+".";state.coins+=hunt.prey==="غزال"?950:420;save();hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none"}else{document.getElementById("log").textContent="أخطأت الطريدة وهربت. على الكلب إعادة التتبع.";hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none";hunt.tracking=0}}
 function applyWeather(){
 if(!scene)return;
 let c=weatherData?.current?.weather_code??0;
