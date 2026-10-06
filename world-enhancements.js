@@ -8,7 +8,7 @@
   }
 
   function addMountainRing(){
-    if(!window.scene||mountainRing) return;
+    if(!(typeof scene!=="undefined"&&scene)||mountainRing) return;
     mountainRing=new THREE.Group();
     for(let i=0;i<18;i++){
       const h=rand(8,25), r=rand(22,42);
@@ -22,7 +22,7 @@
   }
 
   function addSky(){
-    if(!window.scene||scene.userData.skyAdded) return;
+    if(!(typeof scene!=="undefined"&&scene)||scene.userData.skyAdded) return;
     const g=new THREE.SphereGeometry(170,32,16);
     const m=new THREE.MeshBasicMaterial({color:0x7d927f,side:THREE.BackSide,depthWrite:false});
     const sky=new THREE.Mesh(g,m);
@@ -32,7 +32,7 @@
   }
 
   function addGrass(){
-    if(!window.scene||scene.userData.grassAdded) return;
+    if(!(typeof scene!=="undefined"&&scene)||scene.userData.grassAdded) return;
     for(let i=0;i<280;i++){
       const g=new THREE.Group();
       const blade=new THREE.Mesh(new THREE.ConeGeometry(.035,.45,3),mat(i%3?0x31522e:0x49633b));
@@ -47,7 +47,7 @@
   }
 
   function addTrail(){
-    if(!window.scene||scene.userData.trailAdded) return;
+    if(!(typeof scene!=="undefined"&&scene)||scene.userData.trailAdded) return;
     const curve=new THREE.CatmullRomCurve3([
       new THREE.Vector3(-80,.03,65),new THREE.Vector3(-40,.04,28),
       new THREE.Vector3(-18,.05,12),new THREE.Vector3(5,.04,-8),
@@ -61,7 +61,7 @@
   }
 
   function addTracks(){
-    if(!window.scene||scene.userData.tracksAdded) return;
+    if(!(typeof scene!=="undefined"&&scene)||scene.userData.tracksAdded) return;
     for(let i=0;i<28;i++){
       const g=new THREE.CircleGeometry(.09,8);
       const m=new THREE.MeshBasicMaterial({color:0x252a22,transparent:true,opacity:.42,depthWrite:false});
@@ -74,7 +74,7 @@
   }
 
   function addBirds(){
-    if(!window.scene||scene.userData.birdsAdded) return;
+    if(!(typeof scene!=="undefined"&&scene)||scene.userData.birdsAdded) return;
     for(let i=0;i<8;i++){
       const b=new THREE.Group();
       const body=new THREE.Mesh(new THREE.SphereGeometry(.13,7,6),mat(0x202722));
@@ -88,7 +88,7 @@
   }
 
   function setupWorld(){
-    if(!window.THREE||!window.scene) return;
+    if(!(typeof THREE!=="undefined"&&THREE)||!(typeof scene!=="undefined"&&scene)) return;
     addSky(); addMountainRing(); addGrass(); addTrail(); addTracks(); addBirds();
   }
 
@@ -110,7 +110,7 @@
   }
 
   function worldTick(t){
-    if(window.scene){
+    if((typeof scene!=="undefined"&&scene)){
       grass.forEach((g,i)=>{g.rotation.z=Math.sin(t*.001+i)*.035});
       birds.forEach((b,i)=>{
         b.g.position.x+=.012+Math.sin(t*.0004+b.phase)*.004;
@@ -118,7 +118,7 @@
         b.g.rotation.y=Math.sin(t*.0005+b.phase)*.35;
         if(b.g.position.x>90)b.g.position.x=-90;
       });
-      if(window.dog && window.active){
+      if((typeof dog!=="undefined"&&dog) && (typeof active!=="undefined"&&active)){
         dog.rotation.y=Math.sin(t*.002)*.12;
         dog.position.y=Math.abs(Math.sin(t*.008))*.025;
       }
@@ -140,8 +140,8 @@
     setTimeout(setupWorld,100);
   };
 
-  const oldDog=window.dogCmd;
-  window.dogCmd=function(c){
+  const oldDog=(typeof dog!=="undefined"&&dog)Cmd;
+  (typeof dog!=="undefined"&&dog)Cmd=function(c){
     oldDog(c);
     if(c==="ابحث"||c==="تتبع") tracks.forEach((x,i)=>x.material.opacity=.18+.02*i);
   };
