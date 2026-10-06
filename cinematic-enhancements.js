@@ -13,7 +13,7 @@
   let cinematicMode = false;
 
   function ensureCinematicCamera(){
-    if(!window.scene || !window.cam || !window.THREE) return;
+    if(!(typeof scene!=="undefined"&&scene) || !(typeof cam!=="undefined"&&cam) || !window.THREE) return;
     if(cinematicCamera) return;
     cinematicCamera = {
       savedPos: new THREE.Vector3(),
@@ -29,7 +29,7 @@
     document.getElementById("cinSub").textContent=sub;
     e.classList.add("show");
     ensureCinematicCamera();
-    if(window.cam && cinematicCamera){
+    if((typeof cam!=="undefined"&&cam) && cinematicCamera){
       cinematicCamera.savedPos.copy(cam.position);
       cinematicCamera.savedQuat.copy(cam.quaternion);
       cinematicMode=true;
@@ -43,7 +43,7 @@
         cam.position.y += 2.2;
         cam.position.z += 5.5;
       }
-      if(window.animal && animal.visible) cinematicCamera.target.copy(animal.position);
+      if((typeof animal!=="undefined"&&animal) && animal.visible) cinematicCamera.target.copy(animal.position);
       else cinematicCamera.target.set(cam.position.x,1,cam.position.z-8);
     }
     clearTimeout(window.__filmTimer);
@@ -68,7 +68,7 @@
       if(typeof tracking!=="undefined" && tracking>=50){
         hiddenSpecies = prey[Math.floor(Math.random()*prey.length)];
         originalDogCmd(command);
-        if(window.animal){
+        if((typeof animal!=="undefined"&&animal)){
           animal.visible=true;
           animal.scale.setScalar(hiddenSpecies==="غزال"?1.8:hiddenSpecies==="ذئب"?1.25:1);
         }
@@ -92,7 +92,7 @@
   };
 
   function createWeatherParticles(){
-    if(!window.scene || !window.THREE || weatherParticles) return;
+    if(!(typeof scene!=="undefined"&&scene) || !window.THREE || weatherParticles) return;
     const count=900;
     const p=new Float32Array(count*3);
     for(let i=0;i<count;i++){
@@ -123,7 +123,7 @@
   }
 
   function cinematicTick(){
-    if(window.renderer && window.scene && window.cam){
+    if((typeof renderer!=="undefined"&&renderer) && (typeof scene!=="undefined"&&scene) && (typeof cam!=="undefined"&&cam)){
       createWeatherParticles();
       updateWeatherParticles();
 
@@ -148,7 +148,7 @@
   }
 
   function realLightTick(){
-    if(!window.sunLight || !window.scene) return;
+    if(!(typeof sunLight!=="undefined"&&sunLight) || !(typeof scene!=="undefined"&&scene)) return;
     const d=new Date();
     const h=d.getHours()+d.getMinutes()/60;
     const daylight=Math.max(0,Math.sin(((h-6)/12)*Math.PI));
