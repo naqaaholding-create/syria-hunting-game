@@ -88,7 +88,7 @@
     const name=hiddenSpecies || "حيوان بري";
     const reward=name==="غزال"?950:name==="ذئب"?600:420;
     s.coins+=reward; save();
-    found=false; preyFleeing=true; preyFleeVector={x:(Math.random()-.5)*2,z:(Math.random()-.5)*2}; hiddenSpecies=null;
+    found=false; preyFleeing=true; preyFleeVector={x:(Math.random()-.5)*2,z:(Math.random()-.5)*2}; preySpeed=hiddenSpecies==='غزال'?0.075:(hiddenSpecies==='أرنب بري'?0.095:(hiddenSpecies==='ثعلب'?0.055:0.045)); hiddenSpecies=null;
     if(animal) animal.visible=false;
     film("لحظة الحسم","تم التعرف على الطريدة عند الاقتراب: "+name,3.2,"discovery");
     document.getElementById("msg").textContent="تمت إصابة "+name+" بنجاح. النتيجة محفوظة.";
