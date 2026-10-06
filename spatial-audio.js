@@ -82,6 +82,14 @@
 
   window.spatialAudioInit=initAudio;
   window.spatialAudioShot=function(){ pulse(typeof animal!=="undefined"&&animal&&animal.visible?animal:(typeof player!=="undefined"?player:null),"shot",95,0.18,.65); };
+  const originalFire=window.fire;
+  window.fire=function(){
+    const st=window.__huntState;
+    const valid=!!(st&&st.found&&st.ammo>0);
+    const result=typeof originalFire==="function"?originalFire.apply(this,arguments):undefined;
+    if(valid){ initAudio(); window.spatialAudioShot(); }
+    return result;
+  };
   window.spatialAudioAnimal=function(){ pulse(typeof animal!=="undefined"?animal:null,"animal",190,0.04,.5); };
   window.spatialAudioTick=()=>{};
   window.addEventListener("pointerdown",initAudio,{once:false,passive:true});
