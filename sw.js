@@ -1,5 +1,5 @@
-const CACHE='journey-hunt-v1';
-const CORE=['./','./index.html','./cinematic-enhancements.js','./world-enhancements.js','./manifest.webmanifest'];
+const CACHE='journey-hunt-v2';
+const CORE=['./','./index.html','./cinematic-enhancements.js','./world-enhancements.js','./spatial-audio.js','./manifest.webmanifest'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{
