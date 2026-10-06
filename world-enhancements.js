@@ -140,10 +140,11 @@
     setTimeout(setupWorld,100);
   };
 
-  const oldDog=(typeof dog!=="undefined"&&dog)Cmd;
-  (typeof dog!=="undefined"&&dog)Cmd=function(c){
-    oldDog(c);
+  const oldDog = window.dogCmd;
+  window.dogCmd = function(c){
+    if(typeof oldDog==="function") oldDog(c);
     if(c==="ابحث"||c==="تتبع") tracks.forEach((x,i)=>x.material.opacity=.18+.02*i);
+    if(window.spatialAudioInit) window.spatialAudioInit();
   };
 
   requestAnimationFrame(worldTick);
