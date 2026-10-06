@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رحلة الصيد السورية</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08110b;color:#f4f0df;font-family:Tahoma,Arial}
+header{background:#101d14;padding:15px;display:flex;justify-content:space-between;position:sticky;top:0;z-index:5;border-bottom:1px solid #40543f}
+.gold{color:#dfc86c}
+main{max-width:1000px;margin:auto;padding:14px 14px 90px}
+.page{display:none}.page.active{display:block}
+.card{background:#14251a;border:1px solid #425940;border-radius:18px;padding:15px;margin:10px 0}
+.hero{min-height:300px;border-radius:20px;padding:20px;display:flex;flex-direction:column;justify-content:end;background:linear-gradient(#55704b,#182b1b 65%,#0a130c)}
+h1{font-size:30px;margin:8px 0}
+h2{font-size:25px}
+.small{color:#aeb8aa;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+button{border:0;border-radius:13px;padding:12px;min-height:45px;background:#dec76b;color:#111;font-weight:bold;margin-top:7px}
+button.alt{background:#26392b;color:#fff;border:1px solid #51634d}
+button.selected{outline:2px solid #e3cb70}
+nav{position:fixed;bottom:0;left:0;right:0;background:#06100a;border-top:1px solid #40523d;display:grid;grid-template-columns:repeat(6,1fr);z-index:10}
+nav button{background:transparent;color:#aeb8aa;border-radius:0;margin:0;font-size:10px}
+nav button.active{background:#19291c;color:#e1ca70}
+.scene{height:420px;border-radius:20px;overflow:hidden;position:relative;background:linear-gradient(#779064 0 35%,#4e6849 36% 58%,#243b25 59%)}
+.sun{position:absolute;top:35px;left:9%;width:55px;height:55px;border-radius:50%;background:#ead67d}
+.mountains{position:absolute;top:125px;width:100%;height:140px;background:#314b34;clip-path:polygon(0 70%,18% 25%,35% 64%,52% 18%,68% 63%,84% 32%,100% 70%,100% 100%,0 100%)}
+.ground{position:absolute;bottom:0;width:100%;height:43%;background:#203922}
+.dog{position:absolute;bottom:60px;right:20%;font-size:65px}
+.prey{position:absolute;bottom:105px;left:20%;font-size:55px;display:none}
+.tracks{position:absolute;bottom:70px;left:35%;font-size:27px;display:none}
+.log{background:#07100cdd;border:1px solid #51634d;border-radius:12px;padding:12px;margin-top:8px;min-height:55px}
+.commands{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#dec76b;color:#111;padding:10px 16px;border-radius:12px;display:none;z-index:30}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}}
+@media(orientation:landscape) and (max-height:600px){.scene{height:calc(100vh - 180px)}}
+</style>
+</head>
+
+<body>
+
+<header>
+<b class="gold">🏔️ رحلة الصيد السورية</b>
+<b>🪙 <span id="money">1000</span></b>
+</header>
+
+<main>
+
+<section id="home" class="page active">
+<div class="hero">
+<span class="small">نسخة الاختبار الأولى</span>
+<h1>رحلة صيد واقعية في سوريا</h1>
+<p>اختر المنطقة والوقت والطقس، جهّز كلبك ومعداتك ثم انطلق. الطريدة لا تعرفها مسبقًا.</p>
+<button onclick="show('setup')">🎯 تجهيز رحلة الصيد</button>
+</div>
+
+<div class="grid4">
+<div class="card">🐕<br>الكلب<br><b id="homeDog">ماكس</b></div>
+<div class="card">🎒<br>المعدات<br><b id="homeGun">البندقية الأساسية</b></div>
+<div class="card">🏆<br>المستوى<br><b id="level">1</b></div>
+<div class="card">🗺️<br>الرحلات<br><b id="trips">0</b></div>
+</div>
+</section>
+
+
+<section id="wallet" class="page">
+<h2>🪙 المحفظة</h2>
+<div class="card">
+<h1 class="gold"><span id="walletMoney">1000</span> 🪙</h1>
+<p class="small">الرصيد داخل اللعبة فقط.</p>
+<button onclick="addMoney(500)">➕ إضافة 500 تجريبية</button>
+</div>
+<div class="card">
+<h3>سجل العمليات</h3>
+<div id="history">لا توجد عمليات.</div>
+</div>
+</section>
+
+
+<section id="store" class="page">
+<h2>🛒 متجر الصيد</h2>
+<div id="storeItems" class="grid"></div>
+</section>
+
+
+<section id="dogs" class="page">
+<h2>🐕 الكلاب</h2>
+<p class="small">كل صياد يرافقه كلب واحد فقط في الرحلة.</p>
+<div id="dogList" class="grid"></div>
+</section>
+
+
+<section id="equipment" class="page">
+<h2>🎒 المعدات</h2>
+<div id="equipmentList"></div>
+</section>
+
+
+<section id="setup" class="page">
+<h2>🎯 تجهيز رحلة</h2>
+
+<div class="card">
+<h3>المحافظة</h3>
+<div id="regions" class="grid"></div>
+</div>
+
+<div class="card">
+<h3>الوقت</h3>
+<div id="times" class="grid4"></div>
+
+<h3>الطقس</h3>
+<div id="weather" class="grid4"></div>
+</div>
+
+<div class="card">
+<b>📍 <span id="summary">ذيبين — السويداء</span></b>
+<p class="small">🐕 <span id="setupDog">ماكس</span></p>
+<p class="small">🎒 <span id="setupGun">البندقية الأساسية</span></p>
+<button onclick="startHunt()">🚙 انطلق إلى الميدان</button>
+</div>
+</section>
+
+
+<section id="hunt" class="page">
+
+<div class="scene">
+<div class="sun"></div>
+<div class="mountains"></div>
+<div class="ground"></div>
+<div class="dog">🐕</div>
+<div id="tracks" class="tracks">🐾 🐾 🐾</div>
+<div id="prey" class="prey">🦃</div>
+</div>
+
+<div class="card">
+<div class="row">
+<span>تقدم التتبع</span>
+<b class="gold" id="progress">0%</b>
+</div>
+
+<div class="log" id="huntLog">
+أعطِ الكلب أمر «ابحث».
+</div>
+
+<div class="commands">
+<button onclick="command('ابحث')">🔎 ابحث</button>
+<button onclick="command('تتبع')">🐾 تتبع</button>
+<button onclick="command('ثبت')">🎯 ثبت</button>
+<button onclick="command('توقف')">✋ توقف</button>
+<button onclick="command('تعال')">👋 تعال</button>
+<button onclick="command('اذهب')">➡️ اذهب</button>
+</div>
+
+<button id="huntButton" style="display:none;width:100%" onclick="huntShot()">
+🎯 محاولة الصيد
+</button>
+</div>
+
+</section>
+
+
+<section id="result" class="page">
+<div class="card">
+<h2 id="resultTitle">تم العثور على الطريدة</h2>
+<div id="resultEmoji" style="font-size:75px"></div>
+<p>قيمة الصيد:</p>
+<h1 class="gold"><span id="resultValue">0</span> 🪙</h1>
+<button onclick="sellPrey()">💰 بيع الصيد</button>
+<button class="alt" onclick="show('home')">🏠 الرئيسية</button>
+</div>
+</section>
+
+</main>
+
+
+<nav>
+<button id="nav-home" class="active" onclick="show('home')">🏠<br>الرئيسية</button>
+<button id="nav-wallet" onclick="show('wallet')">🪙<br>المحفظة</button>
+<button id="nav-store" onclick="show('store')">🛒<br>المتجر</button>
+<button id="nav-dogs" onclick="show('dogs')">🐕<br>الكلاب</button>
+<button id="nav-equipment" onclick="show('equipment')">🎒<br>المعدات</button>
+<button id="nav-setup" onclick="show('setup')">🎯<br>الصيد</button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+const regions=[
+"دمشق","ريف دمشق","القنيطرة","درعا","السويداء",
+"حمص","طرطوس","اللاذقية","حماة","إدلب",
+"حلب","الرقة","دير الزور","الحسكة"
+];
+
+const dogs=[
+["ماكس",0,55],
+["جاك",700,65],
+["بلاك",1200,72],
+["أطلس",1900,80],
+["سرحانة",2600,88]
+];
+
+const equipment=[
+["البندقية الأساسية",0,55],
+["بندقية ذاتية 5 طلقات",1200,68],
+["بندقية ذاتية 7 طلقات",2200,76],
+["مزدوجة قوية 27/06",3500,88],
+["مسدس",1800,60]
+];
+
+const store=[
+["💧 ماء",50],
+["🍞 طعام الصياد",60],
+["🥩 طعام الكلب",80],
+["📦 ذخيرة",120],
+["🎒 حقيبة صيد محسنة",450],
+["🥾 ملابس ميدانية",650]
+];
+
+const preyData={
+"حجل":["🦃",420],
+"حمام":["🕊️",300],
+"أرنب":["🐇",260],
+"غزال":["🦌",950],
+"ثعلب":["🦊",600],
+"ذئب":["🐺",1100]
+};
+
+let state=JSON.parse(localStorage.getItem("syriaHunt"))||{
+money:1000,
+dog:"ماكس",
+gun:"البندقية الأساسية",
+dogs:["ماكس"],
+guns:["البندقية الأساسية"],
+level:1,
+xp:0,
+trips:0,
+history:[]
+};
+
+let setup={
+region:"السويداء",
+area:"ذيبين",
+time:"الفجر",
+weather:"صافٍ"
+};
+
+let hunt={
+progress:0,
+prey:null
+};
+
+
+function save(){
+localStorage.setItem("syriaHunt",JSON.stringify(state));
+refresh();
+}
+
+
+function toast(message){
+const t=document.getElementById("toast");
+t.textContent=message;
+t.style.display="block";
+setTimeout(()=>t.style.display="none",1500);
+}
+
+
+function show(id){
+
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+document.getElementById(id).classList.add("active");
+
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+
+const nav=document.getElementById("nav-"+id);
+
+if(nav)nav.classList.add("active");
+
+refresh();
+
+window.scrollTo(0,0);
+}
+
+
+function addMoney(amount){
+state.money+=amount;
+state.history.unshift("إضافة تجريبية +"+amount);
+save();
+toast("تمت إضافة الرصيد");
+}
+
+
+function buyStore(i){
+
+const item=store[i];
+
+if(state.money<item[1]){
+toast("الرصيد غير كافٍ");
+return;
+}
+
+state.money-=item[1];
+
+state.history.unshift(
+"شراء "+item[0]+" -"+item[1]
+);
+
+save();
+
+toast("تم الشراء");
+}
+
+
+function chooseDog(i){
+
+const d=dogs[i];
+
+if(!state.dogs.includes(d[0])){
+
+if(state.money<d[1]){
+toast("الرصيد غير كافٍ");
+return;
+}
+
+state.money-=d[1];
+
+state.dogs.push(d[0]);
+
+state.history.unshift(
+"شراء الكلب "+d[0]+" -"+d[1]
+);
+}
+
+state.dog=d[0];
+
+save();
+
+toast("تم اختيار "+d[0]);
+}
+
+
+function chooseGun(i){
+
+const g=equipment[i];
+
+if(!state.guns.includes(g[0])){
+
+if(state.money<g[1]){
+toast("الرصيد غير كافٍ");
+return;
+}
+
+state.money-=g[1];
+
+state.guns.push(g[0]);
+
+state.history.unshift(
+"شراء "+g[0]+" -"+g[1]
+);
+}
+
+state.gun=g[0];
+
+save();
+
+toast("تم تجهيز "+g[0]);
+}
+
+
+function selectRegion(i){
+
+setup.region=regions[i];
+
+setup.area=setup.region==="السويداء"
+?"ذيبين"
+:"منطقة ميدانية";
+
+refresh();
+}
+
+
+function startHunt(){
+
+if(state.money<80){
+toast("تحتاج 80 🪙 للرحلة");
+return;
+}
+
+state.money-=80;
+state.trips++;
+
+state.history.unshift("تكلفة رحلة الصيد -80");
+
+hunt.progress=0;
+hunt.prey=null;
+
+document.getElementById("progress").textContent="0%";
+document.getElementById("tracks").style.display="none";
+document.getElementById("prey").style.display="none";
+document.getElementById("huntButton").style.display="none";
+
+document.getElementById("huntLog").textContent=
+"دخلت الميدان. أعطِ الكلب أمر «ابحث».";
+
+save();
+
+show("hunt");
+}
+
+
+function command(cmd){
+
+if(cmd==="ابحث"){
+hunt.progress+=20;
+}
+
+if(cmd==="تتبع"){
+hunt.progress+=30;
+document.getElementById("tracks").style.display="block";
+}
+
+if(cmd==="اذهب"){
+hunt.progress+=10;
+}
+
+if(cmd==="توقف"){
+document.getElementById("huntLog").textContent=
+state.dog+" توقف.";
+return;
+}
+
+if(cmd==="تعال"){
+document.getElementById("huntLog").textContent=
+state.dog+" عاد إليك.";
+return;
+}
+
+if(cmd==="ثبت"){
+
+if(hunt.progress<50){
+
+document.getElementById("huntLog").textContent=
+"الكلب لم يثبت على رائحة بعد.";
+
+return;
+}
+
+discoverPrey();
+
+return;
+}
+
+hunt.progress=Math.min(90,hunt.progress);
+
+document.getElementById("progress").textContent=
+hunt.progress+"%";
+
+document.getElementById("huntLog").textContent=
+state.dog+" نفذ الأمر: "+cmd;
+}
+
+
+function discoverPrey(){
+
+let pool;
+
+if(setup.region==="السويداء"){
+
+pool=["حجل","حمام","أرنب","ثعلب","غزال"];
+
+}else{
+
+pool=["حمام","أرنب","ثعلب","حجل","غزال","ذئب"];
+}
+
+hunt.prey=
+pool[Math.floor(Math.random()*pool.length)];
+
+document.getElementById("prey").textContent=
+preyData[hunt.prey][0];
+
+document.getElementById("prey").style.display="block";
+
+document.getElementById("huntButton").style.display="block";
+
+document.getElementById("progress").textContent="اكتشاف";
+
+document.getElementById("huntLog").textContent=
+"🐕 "+state.dog+
+" اكتشف حركة قريبة: "+
+hunt.prey+
+".";
+}
+
+
+function huntShot(){
+
+const dog=dogs.find(d=>d[0]===state.dog);
+const gun=equipment.find(g=>g[0]===state.gun);
+
+let chance=
+0.45+
+dog[2]/1000+
+gun[2]/500;
+
+if(setup.weather==="رياح")chance-=0.08;
+
+if(setup.time==="الفجر")chance+=0.05;
+
+if(Math.random()<chance){
+
+document.getElementById("resultTitle").textContent=
+"نجحت الرحلة!";
+
+document.getElementById("resultEmoji").textContent=
+preyData[hunt.prey][0];
+
+document.getElementById("resultValue").textContent=
+preyData[hunt.prey][1];
+
+show("result");
+
+}else{
+
+hunt.progress=0;
+
+hunt.prey=null;
+
+document.getElementById("huntButton").style.display="none";
+document.getElementById("prey").style.display="none";
+
+document.getElementById("progress").textContent="0%";
+
+document.getElementById("huntLog").textContent=
+"أخطأت الطريدة وهربت. تابع التتبع.";
+
+}
+}
+
+
+function sellPrey(){
+
+if(!hunt.prey){
+show("home");
+return;
+}
+
+const value=preyData[hunt.prey][1];
+
+state.money+=value;
+
+state.xp+=25;
+
+while(state.xp>=state.level*100){
+
+state.xp-=state.level*100;
+state.level++;
+}
+
+state.history.unshift(
+"بيع "+hunt.prey+" +"+value
+);
+
+hunt.prey=null;
+
+save();
+
+toast("تم بيع الصيد");
+
+show("home");
+}
+
+
+function refresh(){
+
+document.getElementById("money").textContent=state.money;
+document.getElementById("walletMoney").textContent=state.money;
+
+document.getElementById("homeDog").textContent=state.dog;
+document.getElementById("homeGun").textContent=state.gun;
+document.getElementById("level").textContent=state.level;
+document.getElementById("trips").textContent=state.trips;
+
+document.getElementById("setupDog").textContent=state.dog;
+document.getElementById("setupGun").textContent=state.gun;
+
+document.getElementById("summary").textContent=
+setup.area+" — "+setup.region;
+
+
+document.getElementById("history").innerHTML=
+state.history.length
+?state.history.map(x=>"<div class='card'>"+x+"</div>").join("")
+:"لا توجد عمليات.";
+
+
+document.getElementById("regions").innerHTML=
+regions.map((r,i)=>
+"<button class='"+(r===setup.region?"selected":"alt")+
+"' onclick='selectRegion("+i+")'>"+r+"</button>"
+).join("");
+
+
+const times=["الفجر","الصباح","المساء","الغروب"];
+
+document.getElementById("times").innerHTML=
+times.map(t=>
+"<button class='"+(t===setup.time?"selected":"alt")+
+"' onclick=\"setup.time='"+t+"';refresh()\">"+t+"</button>"
+).join("");
+
+
+const weather=["صافٍ","غائم","رياح","بارد"];
+
+document.getElementById("weather").innerHTML=
+weather.map(w=>
+"<button class='"+(w===setup.weather?"selected":"alt")+
+"' onclick=\"setup.weather='"+w+"';refresh()\">"+w+"</button>"
+).join("");
+
+
+document.getElementById("dogList").innerHTML=
+dogs.map((d,i)=>
+"<div class='card'>"+
+"<div style='font-size:45px'>🐕</div>"+
+"<b>"+d[0]+"</b>"+
+"<p class='small'>مهارة التتبع: "+d[2]+"</p>"+
+"<button onclick='chooseDog("+i+")'>"+
+(state.dogs.includes(d[0])
+?(state.dog===d[0]?"مجهز":"اختيار")
+:d[1]+" 🪙")+
+"</button>"+
+"</div>"
+).join("");
+
+
+document.getElementById("equipmentList").innerHTML=
+equipment.map((g,i)=>
+"<div class='card row'>"+
+"<span>🎒 <b>"+g[0]+"</b><br>"+
+"<small class='small'>قدرة "+g[2]+"</small></span>"+
+"<button onclick='chooseGun("+i+")'>"+
+(state.guns.includes(g[0])
+?(state.gun===g[0]?"مجهز":"اختيار")
+:g[1]+" 🪙")+
+"</button>"+
+"</div>"
+).join("");
+
+
+document.getElementById("storeItems").innerHTML=
+store.map((s,i)=>
+"<div class='card row'>"+
+"<b>"+s[0]+"</b>"+
+"<button onclick='buyStore("+i+")'>"+
+s[1]+" 🪙</button>"+
+"</div>"
+).join("");
+
+}
+
+refresh();
+
+</script>
+</body>
+</html>
