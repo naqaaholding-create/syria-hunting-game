@@ -66,7 +66,7 @@
   window.dogCmd = function(command){
     if(command==="ثبت" && typeof active!=="undefined" && active){
       if(typeof tracking!=="undefined" && tracking>=50){
-        hiddenSpecies = prey[Math.floor(Math.random()*prey.length)];
+        const wildlifeByArea={"ذيبين":["حجل","أرنب بري","حمام بري","ثعلب"],"جبل العرب":["حجل","أرنب بري","ثعلب","غزال"],"اللجاة الشرقية":["حجل","أرنب بري","ثعلب"],"البادية":["غزال","أرنب بري","ثعلب","ذئب"],"الجزيرة":["أرنب بري","حمام بري","ثعلب"]}; const pool=wildlifeByArea[s.area]||prey; hiddenSpecies=pool[Math.floor(Math.random()*pool.length)];
         originalDogCmd(command);
         if((typeof animal!=="undefined"&&animal)){
           animal.visible=true;
