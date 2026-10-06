@@ -126,6 +126,11 @@ bindJourneyAutosave();
 
 
 
+
+function shopInventory(){try{return JSON.parse(localStorage.getItem('shopInventory')||'{"ammo":7,"water":1,"food":0,"dogFood":0}')}catch(e){return {ammo:7,water:1,food:0,dogFood:0}}}
+function saveShopInventory(v){try{localStorage.setItem('shopInventory',JSON.stringify(v))}catch(e){}}
+function shopBuy(item){const prices={ammo:10,water:5,food:8,dogFood:6};if(!(item in prices))return;const p=playerProgress();if(p.coins<prices[item]){const m=document.getElementById('msg');if(m)m.textContent='💰 الرصيد غير كافٍ';return;}p.coins-=prices[item];const inv=shopInventory();inv[item]=(inv[item]||0)+1;savePlayerProgress(p);saveShopInventory(inv);if(item==='ammo')ammo+=2;const m=document.getElementById('msg');if(m)m.textContent='✅ تم شراء '+(item==='ammo'?'ذخيرة':item==='water'?'ماء':item==='food'?'طعام':'طعام للكلب');}
+
 function playerProgress(){try{return JSON.parse(localStorage.getItem('playerProgress')||'{"level":1,"xp":0,"coins":0}')}catch(e){return {level:1,xp:0,coins:0}}}
 function savePlayerProgress(v){try{localStorage.setItem('playerProgress',JSON.stringify(v))}catch(e){}}
 function grantMissionReward(){const m=missionState();if(!m.completed||m.rewarded)return;const p=playerProgress();p.xp+=100;p.coins+=50;while(p.xp>=p.level*250){p.xp-=p.level*250;p.level++;}m.rewarded=true;savePlayerProgress(p);saveMission(m);if(typeof s!=='undefined')s.coins=p.coins;const el=document.getElementById('msg');if(el)el.textContent='🏆 مكافأة المهمة: +50 قطعة و +100 خبرة';}
@@ -164,4 +169,4 @@ function centerMap(){if(!s.region){toast("اختر محافظة أولًا");ret
 function openGoogleMaps(){if(!s.region){toast("اختر محافظة أولًا");return}const [lat,lon]=places[s.region].c;window.open("https://www.google.com/maps/search/?api=1&query="+lat+","+lon,"_blank")}
 renderPlaces();renderDogs();updatePlace();save();init3D();restoreFieldPosition();if(s.region)loadWeather();
 </script>
-<script src="cinematic-enhancements.js"></script>\n<script src="world-enhancements.js"></script>\n<script>window.addEventListener("error",function(e){const x=document.getElementById("journeyError");if(x){x.style.display="block";x.textContent="خطأ تشغيل: "+(e.message||"غير معروف");}});if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script></body></html>
+<script src="cinematic-enhancements.js"></script>\n<script src="world-enhancements.js"></script>\n<script>window.addEventListener("error",function(e){const x=document.getElementById("journeyError");if(x){x.style.display="block";x.textContent="خطأ تشغيل: "+(e.message||"غير معروف");}});if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script><div id="shopPanel" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px"><button type="button" onclick="shopBuy('ammo')">🔫 ذخيرة 10</button><button type="button" onclick="shopBuy('water')">💧 ماء 5</button><button type="button" onclick="shopBuy('food')">🍞 طعام 8</button><button type="button" onclick="shopBuy('dogFood')">🐕 طعام كلب 6</button></div></body></html>
