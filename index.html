@@ -148,11 +148,12 @@ const regions={
 };
 const dogNames=["ماكس","جاك","بلاك","أطلس","سرحانة"];
 const prey=["حجل","حمام بري","أرنب بري","غزال","ثعلب","ذئب"];
-const state=JSON.parse(localStorage.getItem("journeyHunt")||"null")||{coins:1000,dog:"ماكس",region:"",area:""};
+const state=JSON.parse(localStorage.getItem("journeyHunt")||"null")||{coins:1000,dog:"ماكس",region:"",area:"",ammo:7,stamina:100};
+let sprinting=false,tripActive=false,tripStartedAt=0,player,weapon;
 let audioCtx=null,windGain=null,ambientTimer=null,moveInput={x:0,y:0},animalTarget={x:0,z:0},lastStep=0;
 let weatherData=null,scene,cam,renderer,dog,preyObj,keys={},touch={x:0,y:0},hunt={tracking:0,found:false,prey:null};
 
-function save(){localStorage.setItem("journeyHunt",JSON.stringify(state));document.getElementById("coins").textContent=state.coins}
+function save(){localStorage.setItem("journeyHunt",JSON.stringify(state));document.getElementById("coins").textContent=state.coins;document.getElementById("ammo").textContent=state.ammo||0;document.getElementById("stamina").textContent=Math.round(state.stamina||0)}
 function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1500)}
 function view(id,n){document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.getElementById(n).classList.add("active")}
 function updateClock(){const d=new Date();const s=d.toLocaleTimeString("ar-SY",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});document.getElementById("clock").textContent=s;document.getElementById("tripTime").textContent=s}
@@ -210,6 +211,8 @@ const ov=document.getElementById("envOverlay");
 if(ov){ov.style.opacity=night?".28":dawn||dusk?".12":"0";ov.style.background=night?"rgba(7,14,30,.8)":dusk?"rgba(190,100,45,.18)":"radial-gradient(circle at 50% 15%,rgba(255,255,255,.12),transparent 45%)"}
 if(windGain)windGain.gain.value=(weatherData?.current?.wind_speed_10m||0)>25?.035:.012;
 }
+function toggleSprint(){sprinting=!sprinting;toast(sprinting?"الركض مفعّل":"المشي")}
+function returnFromTrip(){tripActive=false;sprinting=false;if(preyObj)preyObj.visible=false;document.getElementById("shootBtn").style.display="none";document.getElementById("returnBtn").style.display="none";document.getElementById("log").textContent="انتهت الرحلة وتم حفظ نتيجتها.";view("tripView","n-trip");save()}
 function startTrip(){
 if(!state.region||!state.area){toast("اختر المحافظة والمنطقة أولًا");view("tripView","n-trip");return}
 hunt={tracking:0,found:false,prey:null};document.getElementById("shootBtn").style.display="none";document.getElementById("log").textContent="انطلقت إلى "+state.area+" في "+state.region+". الوقت والطقس مرتبطان بالواقع.";view("fieldView","n-field");resetField();applyWeather()
