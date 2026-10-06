@@ -1,0 +1,11 @@
+{
+  "name": "رحلة صيد",
+  "short_name": "رحلة صيد",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07110b",
+  "theme_color": "#16351f",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": []
+}
