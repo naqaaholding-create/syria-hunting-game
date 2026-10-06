@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>رحلة صيد</title>
 <style>
+#envOverlay{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at 50% 15%,rgba(255,255,255,.12),transparent 45%);z-index:2}
+#canvasWrap canvas{display:block}
 :root{--bg:#07100b;--panel:#101d15;--line:#304735;--gold:#e2c86a;--muted:#aeb9ad}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050a07;color:#f4f0df;font-family:Tahoma,Arial,sans-serif}
 button,select{font:inherit}button{min-height:44px;border:1px solid #536b55;border-radius:12px;background:#17271b;color:#fff;padding:9px 13px;font-weight:700}
@@ -57,6 +59,7 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
 </div>
 <div class="cross"></div>
 <div id="joystick"><div id="stick"></div></div>
+<div id="envOverlay"></div>
 <div class="log" id="log">ابدأ من «الرحلة» واختر المحافظة والمنطقة.</div>
 <div class="actions">
 <button onclick="dogCommand('ابحث')">🔎 ابحث</button>
@@ -146,6 +149,7 @@ const regions={
 const dogNames=["ماكس","جاك","بلاك","أطلس","سرحانة"];
 const prey=["حجل","حمام بري","أرنب بري","غزال","ثعلب","ذئب"];
 const state=JSON.parse(localStorage.getItem("journeyHunt")||"null")||{coins:1000,dog:"ماكس",region:"",area:""};
+let audioCtx=null,windGain=null,ambientTimer=null,moveInput={x:0,y:0},animalTarget={x:0,z:0},lastStep=0;
 let weatherData=null,scene,cam,renderer,dog,preyObj,keys={},touch={x:0,y:0},hunt={tracking:0,found:false,prey:null};
 
 function save(){localStorage.setItem("journeyHunt",JSON.stringify(state));document.getElementById("coins").textContent=state.coins}
@@ -182,11 +186,51 @@ applyWeather();
 }catch(e){document.getElementById("weatherLabel").textContent="غير متاح";document.getElementById("tripWeather").textContent="غير متاح";document.getElementById("weatherText").textContent="تعذر جلب الطقس الآن؛ سيستمر الميدان بمحاكاة محلية."}
 }
 function weatherName(code){if(code===0)return"صافي";if(code<=3)return"غائم جزئي";if(code<=48)return"ضباب";if(code<=67)return"مطر";if(code<=77)return"ثلج";if(code<=82)return"زخات";return"عاصفة"}
+function startAmbient(){
+try{
+if(audioCtx)return;
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+osc.type="sine";osc.frequency.value=115;gain.gain.value=.018;osc.connect(gain).connect(audioCtx.destination);osc.start();
+windGain=gain;
+}catch(e){}
+}
+function updateEnvironment(){
+const now=new Date(),h=now.getHours()+now.getMinutes()/60;
+const t=Math.max(0,Math.min(1,(h-5)/15));
+const night=h<5.5||h>=20;
+const dawn=h>=5.5&&h<7.5, dusk=h>=17.5&&h<20;
+const canvas=renderer?.domElement;
+if(scene){
+const base=night?0x101a28:dawn||dusk?0x8b7d63:0x91a77f;
+scene.fog.color.set(base);
+scene.children.forEach(o=>{if(o.isDirectionalLight)o.intensity=night?.45:dawn||dusk?1.1:2.2});
+}
+const ov=document.getElementById("envOverlay");
+if(ov){ov.style.opacity=night?".28":dawn||dusk?".12":"0";ov.style.background=night?"rgba(7,14,30,.8)":dusk?"rgba(190,100,45,.18)":"radial-gradient(circle at 50% 15%,rgba(255,255,255,.12),transparent 45%)"}
+if(windGain)windGain.gain.value=(weatherData?.current?.wind_speed_10m||0)>25?.035:.012;
+}
 function startTrip(){
 if(!state.region||!state.area){toast("اختر المحافظة والمنطقة أولًا");view("tripView","n-trip");return}
 hunt={tracking:0,found:false,prey:null};document.getElementById("shootBtn").style.display="none";document.getElementById("log").textContent="انطلقت إلى "+state.area+" في "+state.region+". الوقت والطقس مرتبطان بالواقع.";view("fieldView","n-field");resetField();applyWeather()
 }
 
+function initTouchControls(){
+const joy=document.getElementById("joystick"),stick=document.getElementById("stick");
+if(!joy)return;
+let active=false;
+const move=(e)=>{
+if(!active)return;
+const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+const dx=e.clientX-cx,dy=e.clientY-cy,max=40,len=Math.min(max,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
+moveInput.x=Math.cos(a)*(len/max);moveInput.y=Math.sin(a)*(len/max);
+stick.style.transform="translate("+moveInput.x*32+"px,"+moveInput.y*32+"px)";
+};
+const end=()=>{active=false;moveInput.x=moveInput.y=0;stick.style.transform="translate(0,0)"};
+joy.addEventListener("pointerdown",e=>{active=true;joy.setPointerCapture(e.pointerId);move(e)});
+joy.addEventListener("pointermove",move);joy.addEventListener("pointerup",end);joy.addEventListener("pointercancel",end);
+joy.style.display="block";
+}
 function init3D(){
 scene=new THREE.Scene();scene.fog=new THREE.Fog(0x91a77f,35,150);
 cam=new THREE.PerspectiveCamera(68,1,.05,300);cam.position.set(0,2.1,7);
@@ -208,8 +252,30 @@ function makeRocks(){for(let i=0;i<35;i++){const m=new THREE.Mesh(new THREE.Dode
 function makeDog(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x5a3420});const body=new THREE.Mesh(new THREE.BoxGeometry(1.2,.7,.55),mat);body.position.y=.8;g.add(body);const head=new THREE.Mesh(new THREE.BoxGeometry(.55,.5,.5),mat);head.position.set(.75,1.05,0);g.add(head);for(const x of [-.4,.4])for(const z of [-.2,.2]){const l=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,.55,6),mat);l.position.set(x,.4,z);g.add(l)}g.position.set(1,0,1);return g}
 function makePrey(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x8f8050});const b=new THREE.Mesh(new THREE.SphereGeometry(.38,12,8),mat);b.scale.set(1.5,.9,1);b.position.y=.7;g.add(b);const h=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),mat);h.position.set(.55,.85,0);g.add(h);g.position.set(-4,0,-10);return g}
 function resetField(){if(dog){dog.position.set(1,0,1);dog.rotation.y=0}if(preyObj){preyObj.visible=false}}
-function animate(){requestAnimationFrame(animate);movePlayer();if(dog){dog.position.x+=(cam.position.x+.8-dog.position.x)*.03;dog.position.z+=(cam.position.z+1.2-dog.position.z)*.03}renderer.render(scene,cam)}
-function movePlayer(){const speed=.08;let f=0,s=0;if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)s=-1;if(keys.d||keys.ArrowRight)s=1;cam.translateZ(-f*speed);cam.translateX(s*speed);cam.position.y=2.1}
+function animate(){
+requestAnimationFrame(animate);
+movePlayer();
+updateEnvironment();
+if(dog){
+const dx=cam.position.x+.8-dog.position.x,dz=cam.position.z+1.2-dog.position.z;
+dog.position.x+=dx*.035;dog.position.z+=dz*.035;
+dog.rotation.y=Math.atan2(dx,dz);
+}
+if(preyObj&&preyObj.visible){
+const dx=preyObj.position.x-animalTarget.x,dz=preyObj.position.z-animalTarget.z;
+if(Math.hypot(dx,dz)<1){animalTarget.x=(Math.random()-.5)*45;animalTarget.z=(Math.random()-.5)*45}
+preyObj.position.x+=(animalTarget.x-preyObj.position.x)*.002;
+preyObj.position.z+=(animalTarget.z-preyObj.position.z)*.002;
+}
+renderer.render(scene,cam)
+}
+function movePlayer(){
+const speed=.11;let f=0,s=0;
+if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)s=-1;if(keys.d||keys.ArrowRight)s=1;
+f+=-moveInput.y;s+=moveInput.x;
+const moving=Math.abs(f)+Math.abs(s)>.08;
+if(moving){cam.translateZ(-f*speed);cam.translateX(s*speed);cam.position.y=2.1;const now=performance.now();if(now-lastStep>650){lastStep=now;document.getElementById("log").textContent="خطوات الصياد تتغير مع سرعة الحركة…"}}
+}
 window.addEventListener("keydown",e=>keys[e.key]=true);window.addEventListener("keyup",e=>keys[e.key]=false);
 function resize(){const w=document.getElementById("canvasWrap").clientWidth,h=document.getElementById("canvasWrap").clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();renderer.setSize(w,h)}
 function dogCommand(c){
@@ -222,12 +288,24 @@ if(c==="تعال"){document.getElementById("log").textContent=state.dog+" عاد
 if(c==="ثبت"){if(hunt.tracking<50){document.getElementById("log").textContent="الكلب لم يثبت على الطريدة بعد.";return}discover()}
 hunt.tracking=Math.min(90,hunt.tracking)
 }
-function discover(){hunt.prey=prey[Math.floor(Math.random()*prey.length)];hunt.found=true;preyObj.visible=true;preyObj.position.set(cam.position.x-4,0,cam.position.z-12);document.getElementById("shootBtn").style.display="block";document.getElementById("log").textContent=state.dog+" ثبت على حركة قريبة. الطريدة لم تكن معروفة مسبقًا."}
+function discover(){
+hunt.prey=prey[Math.floor(Math.random()*prey.length)];hunt.found=true;preyObj.visible=true;
+preyObj.position.set(cam.position.x-4,0,cam.position.z-12);animalTarget.x=preyObj.position.x+(Math.random()-.5)*18;animalTarget.z=preyObj.position.z+(Math.random()-.5)*18;
+document.getElementById("shootBtn").style.display="block";
+document.getElementById("log").textContent=state.dog+" ثبت على حركة قريبة. الطريدة تتحرك في الميدان ولا تظهر مسبقًا.";
+}
 function shoot(){if(!hunt.found)return;const dist=cam.position.distanceTo(preyObj.position);const chance=Math.max(.25,Math.min(.9,.72-dist*.025));if(Math.random()<chance){document.getElementById("log").textContent="تمت إصابة "+hunt.prey+" في "+state.area+".";state.coins+=hunt.prey==="غزال"?950:420;save();hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none"}else{document.getElementById("log").textContent="أخطأت الطريدة وهربت. على الكلب إعادة التتبع.";hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none";hunt.tracking=0}}
-function applyWeather(){if(!scene)return;let c=weatherData?.current?.weather_code??0;if(c>=51&&c<=82){scene.fog.color.set(0x778a75)}else scene.fog.color.set(0x91a77f)}
+function applyWeather(){
+if(!scene)return;
+let c=weatherData?.current?.weather_code??0;
+const ov=document.getElementById("envOverlay");
+if(c>=51&&c<=82){scene.fog.color.set(0x778a75);if(ov)ov.style.background="repeating-linear-gradient(110deg,rgba(210,225,235,.10) 0 2px,transparent 2px 13px)"}
+else if(c>=1&&c<=3){scene.fog.color.set(0x879b84);if(ov)ov.style.background="radial-gradient(circle at 50% 20%,rgba(235,235,225,.15),transparent 55%)"}
+else{scene.fog.color.set(0x91a77f)}
+}
 function renderDogs(){const b=document.getElementById("dogs");b.innerHTML="";dogNames.forEach((n,i)=>{const x=document.createElement("button");x.textContent=(state.dog===n?"✓ ":"")+"🐕 "+n;x.onclick=()=>{state.dog=n;save();renderDogs();toast("تم اختيار "+n)};b.appendChild(x)})}
 function renderGear(){document.getElementById("gear").innerHTML=["بندقية أساسية","ذخيرة","ماء","طعام الصياد","طعام الكلب"].map(x=>"<div class='panel'><b>🎒 "+x+"</b><p class='muted'>تجهيز ميداني</p></div>").join("")}
-buildRegions();renderDogs();renderGear();updatePlace();save();init3D();if(state.region)fetchWeather();
+buildRegions();renderDogs();renderGear();updatePlace();save();init3D();initTouchControls();startAmbient();if(state.region)fetchWeather();
 </script>
 </body>
 </html>
