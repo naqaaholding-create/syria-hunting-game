@@ -1,322 +1,120 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>رحلة صيد</title>
 <style>
-#envOverlay{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at 50% 15%,rgba(255,255,255,.12),transparent 45%);z-index:2}
-#canvasWrap canvas{display:block}
-:root{--bg:#07100b;--panel:#101d15;--line:#304735;--gold:#e2c86a;--muted:#aeb9ad}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050a07;color:#f4f0df;font-family:Tahoma,Arial,sans-serif}
-button,select{font:inherit}button{min-height:44px;border:1px solid #536b55;border-radius:12px;background:#17271b;color:#fff;padding:9px 13px;font-weight:700}
-button.primary{background:var(--gold);color:#111;border-color:#ead789}.gold{color:var(--gold)}.muted{color:var(--muted);font-size:12px}
-#app{position:fixed;inset:0;display:flex;flex-direction:column}
-.top{height:56px;flex:0 0 56px;background:#0b160eec;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:20}
-.top b{font-size:17px}.status{display:flex;gap:9px;align-items:center;font-size:12px}
-#game{position:relative;flex:1;min-height:0}.view{position:absolute;inset:0;display:none}.view.active{display:block}
-#canvasWrap{position:absolute;inset:0}.hud{position:absolute;inset:0;pointer-events:none}.hud>*{pointer-events:auto}
-.info{position:absolute;top:10px;right:10px;left:10px;display:flex;justify-content:space-between;gap:8px}
-.pill{background:#07100cd9;border:1px solid #40583f;border-radius:12px;padding:7px 10px;font-size:12px;backdrop-filter:blur(4px)}
-.log{position:absolute;left:10px;right:10px;bottom:100px;background:#07100cdb;border:1px solid #40583f;border-radius:13px;padding:9px;font-size:13px;min-height:42px}
-.actions{position:absolute;bottom:10px;left:10px;right:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.actions button{background:#07100cdb}.actions button.primary{background:var(--gold);color:#111}
-.cross{position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%);opacity:.75}
-.cross:before,.cross:after{content:"";position:absolute;background:#fff}.cross:before{width:2px;height:20px;left:9px}.cross:after{height:2px;width:20px;top:9px}
-#menuView{overflow:auto;padding:12px 12px 80px;background:linear-gradient(#0b160e,#07100b)}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px}
-h1,h2,h3{margin:4px 0 10px}.hero{padding:16px;border-radius:17px;background:linear-gradient(135deg,#213b26,#0e1b12);border:1px solid #466045}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-select,input{width:100%;min-height:44px;border:1px solid #536b55;border-radius:11px;background:#09130c;color:#fff;padding:9px}
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-.regionBtn{text-align:right}.regionBtn.selected{outline:2px solid var(--gold);background:#283b29}
-.areaGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
-.nav{height:64px;flex:0 0 64px;background:#06100aeF;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:30}
-.nav button{border:0;border-radius:0;background:transparent;color:#9eaa9f;padding:5px;font-size:11px}
-.nav button.active{color:var(--gold);background:#14231a}
-#weatherText{line-height:1.7}
-.lock{opacity:.5;filter:grayscale(1)}
-.toast{position:absolute;z-index:50;top:65px;left:50%;transform:translateX(-50%);background:var(--gold);color:#111;border-radius:12px;padding:9px 14px;display:none;font-weight:700}
-#joystick{position:absolute;left:18px;bottom:115px;width:110px;height:110px;border-radius:50%;background:#07100c88;border:1px solid #8a9b80;display:none}
-#stick{position:absolute;width:46px;height:46px;left:32px;top:32px;border-radius:50%;background:#d8c16a;opacity:.8}
-@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.areaGrid{grid-template-columns:repeat(3,1fr)}}
+:root{--bg:#07100b;--panel:#0d1a12eF;--line:#304638;--gold:#e4c768;--text:#f4f0df;--muted:#a9b5aa;--danger:#b96b5d}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#030705;color:var(--text);font-family:system-ui,Tahoma,Arial,sans-serif;overflow:hidden}
+button,select,input{font:inherit}button{border:1px solid #465c4b;background:#13231a;color:var(--text);border-radius:14px;min-height:44px;padding:9px 13px;font-weight:700}button:active{transform:scale(.98)}button.primary{background:var(--gold);color:#111;border-color:#f1d983}.muted{color:var(--muted);font-size:12px}.gold{color:var(--gold)}
+#app{height:100%;display:flex;flex-direction:column}.top{height:58px;flex:0 0 58px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#07110beF;border-bottom:1px solid var(--line);z-index:20}.brand{font-weight:900;font-size:19px}.wallet{font-size:12px}.wallet b{font-size:16px}
+main{position:relative;flex:1;min-height:0}.view{position:absolute;inset:0;display:none}.view.active{display:block}
+#field{position:absolute;inset:0;background:#17291c}#canvas{position:absolute;inset:0}#canvas canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;inset:0;pointer-events:none}.hud>*{pointer-events:auto}.topchips{position:absolute;top:11px;left:11px;right:11px;display:flex;gap:7px;justify-content:space-between}.chip{background:#07100cd9;border:1px solid #536653;border-radius:13px;padding:7px 10px;font-size:11px;backdrop-filter:blur(8px)}
+.centerAim{position:absolute;left:50%;top:50%;width:28px;height:28px;transform:translate(-50%,-50%);opacity:.8}.centerAim:before,.centerAim:after{content:"";position:absolute;background:#fff}.centerAim:before{width:2px;height:28px;left:13px}.centerAim:after{height:2px;width:28px;top:13px}
+.message{position:absolute;bottom:92px;left:12px;right:12px;background:#07100de6;border:1px solid #455a49;border-radius:15px;padding:10px 12px;font-size:13px}
+.controls{position:absolute;bottom:10px;left:10px;right:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.controls button{background:#07100de8}.controls .wide{grid-column:span 2}
+.joy{position:absolute;left:16px;bottom:180px;width:106px;height:106px;border-radius:50%;border:1px solid #87968688;background:#07100c55;display:none}.knob{width:44px;height:44px;position:absolute;left:31px;top:31px;border-radius:50%;background:#e1c668cc}
+#menu{overflow:auto;padding:12px 12px 78px;background:linear-gradient(180deg,#0b1710,#06100a)}.hero{border:1px solid #405941;border-radius:20px;padding:17px;background:linear-gradient(135deg,#203b27,#0b1710);margin-bottom:10px}.hero h1{margin:0 0 7px;font-size:27px}.hero p{margin:0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:12px;margin-bottom:10px}.panel h2,.panel h3{margin:0 0 10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.regions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.region{min-height:58px;text-align:right}.region.selected{outline:2px solid var(--gold);background:#253927}.areas{display:grid;grid-template-columns:1fr 1fr;gap:7px}.area.selected{outline:2px solid var(--gold)}
+.tripbar{position:sticky;bottom:0;margin:0 -12px;padding:10px 12px;background:#06100af2;border-top:1px solid var(--line);backdrop-filter:blur(10px);z-index:5}.tripbar button{width:100%}
+#admin,#gear{overflow:auto;padding:12px 12px 78px;background:#07110b}.stat{background:#101e15;border:1px solid var(--line);border-radius:15px;padding:11px}.stat b{font-size:19px}.listrow{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #26392c;font-size:13px}
+.nav{height:65px;flex:0 0 65px;display:grid;grid-template-columns:repeat(4,1fr);background:#06100af7;border-top:1px solid var(--line);z-index:30}.nav button{border:0;border-radius:0;background:transparent;color:#9da99e;font-size:11px;padding:5px}.nav button.active{color:var(--gold);background:#14231a}
+.toast{position:absolute;top:67px;left:50%;transform:translateX(-50%);background:var(--gold);color:#111;padding:9px 13px;border-radius:12px;font-weight:800;display:none;z-index:100;white-space:nowrap}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:25px;text-align:center;background:linear-gradient(#15281a,#07100b);z-index:10}.err .box{max-width:440px;background:#0c1810;border:1px solid #465d4a;border-radius:18px;padding:18px}
+@media(min-width:700px){.regions,.areas{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
 <div id="app">
-<header class="top">
-<b class="gold">🏔️ رحلة صيد</b>
-<div class="status"><span id="clock">--:--</span><span>🪙 <b id="coins">1000</b></span></div>
-</header>
-
-<main id="game">
+<header class="top"><div class="brand gold">🏔️ رحلة صيد</div><div class="wallet">🪙 <b id="coins">1000</b></div></header>
+<main>
 <section id="fieldView" class="view active">
-<div id="canvasWrap"></div>
+<div id="field"><div id="canvas"></div></div>
 <div class="hud">
-<div class="info">
-<div class="pill">📍 <span id="placeLabel">اختر المنطقة</span></div>
-<div class="pill">🌤️ <span id="weatherLabel">—</span></div><div class="pill">🔫 <span id="ammo">7</span> • ❤️ <span id="stamina">100</span></div>
-</div>
-<div class="cross"></div>
-<div id="joystick"><div id="stick"></div></div>
-<div id="envOverlay"></div>
-<div class="log" id="log">ابدأ من «الرحلة» واختر المحافظة والمنطقة.</div>
-<div class="actions">
-<button onclick="dogCommand('ابحث')">🔎 ابحث</button>
-<button onclick="dogCommand('تتبع')">🐾 تتبع</button>
-<button onclick="dogCommand('ثبت')">📍 ثبت</button>
-<button onclick="dogCommand('توقف')">✋ توقف</button>
-<button onclick="dogCommand('تعال')">🐕 تعال</button>
-<button id="shootBtn" class="primary" style="display:none" onclick="shoot()">🎯 تصويب</button>
-</div>
-</div>
-</section>
+<div class="topchips"><span class="chip">📍 <b id="place">لم تحدد الرحلة</b></span><span class="chip">🕒 <b id="clock">--:--</b></span><span class="chip">🌤️ <b id="weather">—</b></span></div>
+<div class="centerAim"></div><div id="joy" class="joy"><div id="knob" class="knob"></div></div>
+<div id="msg" class="message">ابدأ من «الرحلة» وحدد المحافظة والمنطقة والكلب.</div>
+<div class="controls"><button onclick="dogCmd('ابحث')">🔎 ابحث</button><button onclick="dogCmd('تتبع')">🐾 تتبع</button><button onclick="dogCmd('ثبت')">📍 ثبت</button><button onclick="dogCmd('توقف')">✋ توقف</button><button onclick="dogCmd('تعال')">🐕 تعال</button><button id="fire" class="primary" onclick="fire()">🎯 إطلاق</button></div>
+</div></section>
 
-<section id="tripView" class="view" style="overflow:auto;padding:12px 12px 80px;background:#07100b">
-<div class="hero">
-<h1>رحلة صيد</h1>
-<p class="muted">اختر المكان أولًا. المنطقة والطبيعة والطقس والوقت تتغير حسب اختيارك والوقت الواقعي.</p>
-</div>
+<section id="tripView" class="view"><div id="menu">
+<div class="hero"><h1>رحلة صيد</h1><p class="muted">رحلة ميدانية ثلاثية الأبعاد. اختر المكان، جهّز كلبك، ثم انطلق. الوقت والطقس يتغيران مع الواقع.</p></div>
+<div class="panel"><h3>المحافظة</h3><div id="regions" class="regions"></div></div>
+<div class="panel"><h3>منطقة الرحلة</h3><div id="areas" class="areas"></div></div>
+<div class="panel"><h3>الظروف الحالية</h3><div class="grid3"><div class="stat"><span class="muted">الوقت</span><br><b id="tripClock">—</b></div><div class="stat"><span class="muted">الحرارة</span><br><b id="tripTemp">—</b></div><div class="stat"><span class="muted">الرياح</span><br><b id="tripWind">—</b></div></div></div>
+<div class="panel"><h3>اختر كلب الرحلة</h3><div id="dogs" class="grid2"></div></div>
+<div class="tripbar"><button id="start" class="primary" onclick="startTrip()">🚙 بدء الرحلة</button></div>
+</div></section>
 
-<div class="panel">
-<h3>1 — المحافظة</h3>
-<div id="regions" class="grid"></div>
-</div>
+<section id="gearView" class="view"><div id="gear"><div class="panel"><h2>🎒 التجهيز</h2><p class="muted">تجهيز الرحلة قبل الانطلاق.</p></div><div class="panel"><div class="listrow"><span>بندقية أساسية</span><b>متوفرة</b></div><div class="listrow"><span>ذخيرة</span><b>7 طلقات</b></div><div class="listrow"><span>ماء</span><b>1</b></div><div class="listrow"><span>طعام الكلب</span><b>1</b></div></div></div></section>
 
-<div class="panel">
-<h3>2 — منطقة الرحلة</h3>
-<div id="areas" class="areaGrid"></div>
-</div>
-
-<div class="panel">
-<div class="grid">
-<div><label>الوقت الواقعي</label><b id="tripTime">—</b></div>
-<div><label>الطقس الحقيقي</label><b id="tripWeather">—</b></div>
-</div>
-<div id="weatherText" class="muted" style="margin-top:8px">سيتم جلب حالة الطقس للمنطقة المختارة.</div>
-</div>
-
-<div class="panel">
-<h3>الكلب</h3>
-<div class="grid3" id="dogs"></div>
-</div>
-
-<button class="primary" style="width:100%" onclick="startTrip()">🚙 ابدأ الرحلة</button>
-</section>
-
-<section id="storeView" class="view" style="overflow:auto;padding:12px 12px 80px;background:#07100b">
-<div class="panel"><h2>🎒 التجهيزات</h2><p class="muted">النسخة الحالية تركز على المحاكاة الميدانية والاختيار الواقعي للموقع.</p></div>
-<div id="gear"></div>
-</section>
-
-<section id="adminView" class="view" style="overflow:auto;padding:12px 12px 80px;background:#07100b">
-<div class="panel"><h2>⚙️ الإدارة</h2><p class="muted">لوحة اختبار محلية. لا توجد تحويلات مالية حقيقية من هذه الصفحة.</p></div>
-<div class="grid">
-<div class="panel"><span class="muted">صندوق اللاعبين</span><h2 class="gold">20%</h2></div>
-<div class="panel"><span class="muted">SafePal</span><h2>يدوي</h2></div>
-</div>
-<div class="panel"><h3>خطة السحب</h3><p class="muted">طلب اللاعب → مراجعة → موافقة المدير → تحويل SafePal → TXID.</p></div>
-</section>
+<section id="adminView" class="view"><div id="admin"><div class="panel"><h2>⚙️ الإدارة</h2><p class="muted">لوحة إدارة اختبارية. التحويلات المالية الحقيقية غير مفعلة داخل اللعبة.</p></div><div class="grid2"><div class="stat"><span class="muted">صندوق اللاعبين</span><br><b class="gold">20%</b></div><div class="stat"><span class="muted">SafePal</span><br><b>يدوي</b></div></div><div class="panel"><h3>مسار السحب</h3><p class="muted">طلب → مراجعة → موافقة → SafePal → TXID.</p></div></div></section>
 </main>
-
-<nav class="nav">
-<button id="n-field" class="active" onclick="view('fieldView','n-field')">🌄<br>الميدان</button>
-<button id="n-trip" onclick="view('tripView','n-trip')">🗺️<br>الرحلة</button>
-<button id="n-store" onclick="view('storeView','n-store')">🎒<br>التجهيز</button>
-<button id="n-admin" onclick="view('adminView','n-admin')">⚙️<br>الإدارة</button>
-</nav>
+<nav class="nav"><button id="navField" class="active" onclick="show('fieldView','navField')">🌄<br>الميدان</button><button id="navTrip" onclick="show('tripView','navTrip')">🗺️<br>الرحلة</button><button id="navGear" onclick="show('gearView','navGear')">🎒<br>التجهيز</button><button id="navAdmin" onclick="show('adminView','navAdmin')">⚙️<br>الإدارة</button></nav>
 <div id="toast" class="toast"></div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
 <script>
-const regions={
+const places={
 "دمشق":{c:[33.5138,36.2765],a:["جبل قاسيون","الغوطة","وادي بردى"]},
-"ريف دمشق":{c:[33.5000,36.1000],a:["القطيفة","الزبداني","القلمون"]},
-"القنيطرة":{c:[33.1250,35.8246],a:["الجولان الشمالي","الحمّة","ريف القنيطرة"]},
-"درعا":{c:[32.6250,36.1050],a:["اللجاة","حوض اليرموك","ريف درعا"]},
-"السويداء":{c:[32.7089,36.5695],a:["ذيبين","جبل العرب","اللجاة الشرقية"]},
-"حمص":{c:[34.7324,36.7137],a:["تدمر","وادي النصارى","ريف حمص الشرقي"]},
-"طرطوس":{c:[34.8959,35.8867],a:["صافيتا","الدريكيش","ريف طرطوس"]},
-"اللاذقية":{c:[35.5403,35.7828],a:["جبلة","صلنفة","ريف اللاذقية"]},
-"حماة":{c:[35.1318,36.7578],a:["مصياف","الغاب","ريف حماة"]},
-"إدلب":{c:[35.9306,36.6339],a:["جبل الزاوية","سهل الروج","ريف إدلب"]},
-"حلب":{c:[36.2021,37.1343],a:["جبل سمعان","عفرين","ريف حلب"]},
-"الرقة":{c:[35.9594,39.0054],a:["بادية الرقة","ضفاف الفرات","ريف الرقة"]},
-"دير الزور":{c:[35.3359,40.1408],a:["بادية دير الزور","الفرات","ريف دير الزور"]},
-"الحسكة":{c:[36.5024,40.7477],a:["الجزيرة","تل تمر","ريف الحسكة"]}
+"ريف دمشق":{c:[33.5,36.1],a:["القلمون","الزبداني","القطيفة"]},
+"القنيطرة":{c:[33.125,35.825],a:["ريف القنيطرة","الحمّة","الشمال"]},
+"درعا":{c:[32.625,36.105],a:["اللجاة","حوض اليرموك","ريف درعا"]},
+"السويداء":{c:[32.709,36.57],a:["ذيبين","جبل العرب","اللجاة الشرقية"]},
+"حمص":{c:[34.732,36.714],a:["تدمر","ريف حمص","وادي النصارى"]},
+"طرطوس":{c:[34.896,35.887],a:["الدريكيش","صافيتا","ريف طرطوس"]},
+"اللاذقية":{c:[35.54,35.783],a:["صلنفة","جبلة","ريف اللاذقية"]},
+"حماة":{c:[35.132,36.758],a:["مصياف","الغاب","ريف حماة"]},
+"إدلب":{c:[35.931,36.634],a:["جبل الزاوية","سهل الروج","ريف إدلب"]},
+"حلب":{c:[36.202,37.134],a:["جبل سمعان","عفرين","ريف حلب"]},
+"الرقة":{c:[35.959,39.005],a:["بادية الرقة","الفرات","ريف الرقة"]},
+"دير الزور":{c:[35.336,40.141],a:["البادية","الفرات","ريف دير الزور"]},
+"الحسكة":{c:[36.502,40.748],a:["الجزيرة","تل تمر","ريف الحسكة"]}
 };
-const dogNames=["ماكس","جاك","بلاك","أطلس","سرحانة"];
+const dogs=["ماكس","جاك","بلاك","أطلس","سرحانة"];
 const prey=["حجل","حمام بري","أرنب بري","غزال","ثعلب","ذئب"];
-const state=JSON.parse(localStorage.getItem("journeyHunt")||"null")||{coins:1000,dog:"ماكس",region:"",area:"",ammo:7,stamina:100};
-let sprinting=false,tripActive=false,tripStartedAt=0,player,weapon;
-let audioCtx=null,windGain=null,ambientTimer=null,moveInput={x:0,y:0},animalTarget={x:0,z:0},lastStep=0;
-let weatherData=null,scene,cam,renderer,dog,preyObj,keys={},touch={x:0,y:0},hunt={tracking:0,found:false,prey:null};
+let s=JSON.parse(localStorage.getItem("journeyHuntPro")||"null")||{coins:1000,region:"",area:"",dog:"ماكس"};
+let scene,cam,renderer,clock3d,dog,animal,player,keys={},joy={x:0,y:0},tracking=0,found=false,active=false,animalTarget={x:0,z:0};
 
-function save(){localStorage.setItem("journeyHunt",JSON.stringify(state));document.getElementById("coins").textContent=state.coins;document.getElementById("ammo").textContent=state.ammo||0;document.getElementById("stamina").textContent=Math.round(state.stamina||0)}
-function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1500)}
-function view(id,n){document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));document.getElementById(n).classList.add("active")}
-function updateClock(){const d=new Date();const s=d.toLocaleTimeString("ar-SY",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});document.getElementById("clock").textContent=s;document.getElementById("tripTime").textContent=s}
+function save(){localStorage.setItem("journeyHuntPro",JSON.stringify(s));document.getElementById("coins").textContent=s.coins}
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",1500)}
+function show(id,nav){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));document.getElementById(nav).classList.add("active")}
+function updateClock(){const d=new Date(),x=d.toLocaleTimeString("ar-SY",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});document.getElementById("clock").textContent=x;document.getElementById("tripClock").textContent=x}
 setInterval(updateClock,1000);updateClock();
 
-function buildRegions(){
-const box=document.getElementById("regions");box.innerHTML="";
-Object.keys(regions).forEach(r=>{const b=document.createElement("button");b.className="regionBtn"+(state.region===r?" selected":"");b.textContent=r;b.onclick=()=>selectRegion(r);box.appendChild(b)});
-renderAreas();
-}
-function renderAreas(){
-const box=document.getElementById("areas");box.innerHTML="";
-if(!state.region){box.innerHTML="<div class='muted'>اختر محافظة أولًا.</div>";return}
-regions[state.region].a.forEach(a=>{const b=document.createElement("button");b.className="regionBtn"+(state.area===a?" selected":"");b.textContent=a;b.onclick=()=>{state.area=a;save();renderAreas();updatePlace()};box.appendChild(b)})
-}
-function selectRegion(r){state.region=r;state.area=regions[r].a[0];save();buildRegions();updatePlace();fetchWeather()}
-function updatePlace(){document.getElementById("placeLabel").textContent=state.region&&state.area?state.region+" — "+state.area:"اختر المنطقة"}
-async function fetchWeather(){
-if(!state.region)return;
-const [lat,lon]=regions[state.region].c;
-document.getElementById("weatherLabel").textContent="جاري التحديث…";
-try{
-const u="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto";
-const r=await fetch(u);weatherData=await r.json();
-const c=weatherData.current, w=weatherName(c.weather_code);
-const txt=w+" • "+Math.round(c.temperature_2m)+"°C • رياح "+Math.round(c.wind_speed_10m)+" كم/س • رطوبة "+Math.round(c.relative_humidity_2m)+"%";
-document.getElementById("weatherLabel").textContent=w+" "+Math.round(c.temperature_2m)+"°";
-document.getElementById("tripWeather").textContent=w+" "+Math.round(c.temperature_2m)+"°";
-document.getElementById("weatherText").textContent=txt+" — المصدر: Open‑Meteo. يتحدث عند فتح الرحلة.";
-applyWeather();
-}catch(e){document.getElementById("weatherLabel").textContent="غير متاح";document.getElementById("tripWeather").textContent="غير متاح";document.getElementById("weatherText").textContent="تعذر جلب الطقس الآن؛ سيستمر الميدان بمحاكاة محلية."}
-}
-function weatherName(code){if(code===0)return"صافي";if(code<=3)return"غائم جزئي";if(code<=48)return"ضباب";if(code<=67)return"مطر";if(code<=77)return"ثلج";if(code<=82)return"زخات";return"عاصفة"}
-function startAmbient(){
-try{
-if(audioCtx)return;
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
-osc.type="sine";osc.frequency.value=115;gain.gain.value=.018;osc.connect(gain).connect(audioCtx.destination);osc.start();
-windGain=gain;
-}catch(e){}
-}
-function updateEnvironment(){
-const now=new Date(),h=now.getHours()+now.getMinutes()/60;
-const t=Math.max(0,Math.min(1,(h-5)/15));
-const night=h<5.5||h>=20;
-const dawn=h>=5.5&&h<7.5, dusk=h>=17.5&&h<20;
-const canvas=renderer?.domElement;
-if(scene){
-const base=night?0x101a28:dawn||dusk?0x8b7d63:0x91a77f;
-scene.fog.color.set(base);
-scene.children.forEach(o=>{if(o.isDirectionalLight)o.intensity=night?.45:dawn||dusk?1.1:2.2});
-}
-const ov=document.getElementById("envOverlay");
-if(ov){ov.style.opacity=night?".28":dawn||dusk?".12":"0";ov.style.background=night?"rgba(7,14,30,.8)":dusk?"rgba(190,100,45,.18)":"radial-gradient(circle at 50% 15%,rgba(255,255,255,.12),transparent 45%)"}
-if(windGain)windGain.gain.value=(weatherData?.current?.wind_speed_10m||0)>25?.035:.012;
-}
-function toggleSprint(){sprinting=!sprinting;toast(sprinting?"الركض مفعّل":"المشي")}
-function returnFromTrip(){tripActive=false;sprinting=false;if(preyObj)preyObj.visible=false;document.getElementById("shootBtn").style.display="none";document.getElementById("returnBtn").style.display="none";document.getElementById("log").textContent="انتهت الرحلة وتم حفظ نتيجتها.";view("tripView","n-trip");save()}
-function startTrip(){
-if(!state.region||!state.area){toast("اختر المحافظة والمنطقة أولًا");view("tripView","n-trip");return}
-hunt={tracking:0,found:false,prey:null};document.getElementById("shootBtn").style.display="none";document.getElementById("log").textContent="انطلقت إلى "+state.area+" في "+state.region+". الوقت والطقس مرتبطان بالواقع.";view("fieldView","n-field");resetField();applyWeather()
-}
+function renderPlaces(){const b=document.getElementById("regions");b.innerHTML="";Object.keys(places).forEach(n=>{const x=document.createElement("button");x.className="region"+(s.region===n?" selected":"");x.textContent=n;x.onclick=()=>{s.region=n;s.area=places[n].a[0];save();renderPlaces();renderAreas();loadWeather()};b.appendChild(x)});renderAreas()}
+function renderAreas(){const b=document.getElementById("areas");b.innerHTML="";if(!s.region){b.innerHTML="<span class='muted'>اختر محافظة أولًا.</span>";return}places[s.region].a.forEach(a=>{const x=document.createElement("button");x.className="area"+(s.area===a?" selected":"");x.textContent=a;x.onclick=()=>{s.area=a;save();renderAreas();updatePlace()};b.appendChild(x)})}
+function renderDogs(){const b=document.getElementById("dogs");b.innerHTML="";dogs.forEach(d=>{const x=document.createElement("button");x.textContent=(s.dog===d?"✓ ":"")+"🐕 "+d;x.onclick=()=>{s.dog=d;save();renderDogs()};b.appendChild(x)})}
+function updatePlace(){document.getElementById("place").textContent=s.region&&s.area?s.region+" — "+s.area:"لم تحدد الرحلة"}
+async function loadWeather(){if(!s.region)return;const [lat,lon]=places[s.region].c;try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&current=temperature_2m,wind_speed_10m,weather_code&timezone=auto");const j=await r.json(),c=j.current;document.getElementById("weather").textContent=weatherName(c.weather_code)+" "+Math.round(c.temperature_2m)+"°";document.getElementById("tripTemp").textContent=Math.round(c.temperature_2m)+"°";document.getElementById("tripWind").textContent=Math.round(c.wind_speed_10m)+" كم/س";}catch(e){document.getElementById("weather").textContent="غير متاح"}}
+function weatherName(c){return c===0?"صافي":c<=3?"غائم":c<=48?"ضباب":c<=67?"مطر":c<=77?"ثلج":c<=82?"زخات":"عاصفة"}
 
-function initTouchControls(){
-const joy=document.getElementById("joystick"),stick=document.getElementById("stick");
-if(!joy)return;
-let active=false;
-const move=(e)=>{
-if(!active)return;
-const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-const dx=e.clientX-cx,dy=e.clientY-cy,max=40,len=Math.min(max,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);
-moveInput.x=Math.cos(a)*(len/max);moveInput.y=Math.sin(a)*(len/max);
-stick.style.transform="translate("+moveInput.x*32+"px,"+moveInput.y*32+"px)";
-};
-const end=()=>{active=false;moveInput.x=moveInput.y=0;stick.style.transform="translate(0,0)"};
-joy.addEventListener("pointerdown",e=>{active=true;joy.setPointerCapture(e.pointerId);move(e)});
-joy.addEventListener("pointermove",move);joy.addEventListener("pointerup",end);joy.addEventListener("pointercancel",end);
-joy.style.display="block";
-}
-function makePlayer(){
-const g=new THREE.Group();
-const body=new THREE.Mesh(new THREE.BoxGeometry(.65,1.05,.38),new THREE.MeshStandardMaterial({color:0x344535,roughness:.95}));body.position.y=1.05;g.add(body);
-const head=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),new THREE.MeshStandardMaterial({color:0xb98768}));head.position.y=1.78;g.add(head);
-for(const x of[-.19,.19]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.16,.7,.2),new THREE.MeshStandardMaterial({color:0x222923}));leg.position.set(x,.35,0);g.add(leg)}
-const w=new THREE.Group();const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.035,.045,.85,8),new THREE.MeshStandardMaterial({color:0x252525,metalness:.5}));barrel.rotation.z=Math.PI/2;barrel.position.set(.48,1.35,-.04);w.add(barrel);const stock=new THREE.Mesh(new THREE.BoxGeometry(.38,.13,.13),new THREE.MeshStandardMaterial({color:0x5a3d25}));stock.position.set(.2,1.2,-.04);w.add(stock);g.add(w);weapon=w;g.position.set(0,0,4);return g}
 function init3D(){
-scene=new THREE.Scene();scene.fog=new THREE.Fog(0x91a77f,35,150);
-cam=new THREE.PerspectiveCamera(68,1,.05,300);cam.position.set(0,2.1,7);
-renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(1,1);renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;
-document.getElementById("canvasWrap").appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xdfe9d0,0x263722,1.6));
-const sun=new THREE.DirectionalLight(0xfff2c7,2.2);sun.position.set(20,35,10);sun.castShadow=true;scene.add(sun);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180,30,30),new THREE.MeshStandardMaterial({color:0x314b2d,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
-for(let i=0;i<85;i++)makeTree((Math.random()-.5)*150,(Math.random()-.5)*130);
-makeRocks();
-dog=makeDog();player=makePlayer();scene.add(player);scene.add(dog);
-preyObj=makePrey();scene.add(preyObj);preyObj.visible=false;
-window.addEventListener("resize",resize);resize();animate();
-renderer.domElement.addEventListener("pointerdown",e=>{touch.x=e.clientX;touch.y=e.clientY});
-renderer.domElement.addEventListener("pointermove",e=>{if(e.buttons){cam.rotation.y-=(e.clientX-touch.x)*.003;cam.rotation.x-=(e.clientY-touch.y)*.002;cam.rotation.x=Math.max(-.9,Math.min(.7,cam.rotation.x));touch.x=e.clientX;touch.y=e.clientY}});
+try{
+scene=new THREE.Scene();scene.background=new THREE.Color(0x8da88b);scene.fog=new THREE.Fog(0x8da88b,25,145);
+cam=new THREE.PerspectiveCamera(67,1,.05,300);cam.position.set(0,2.2,8);
+renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;
+document.getElementById("canvas").appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xddebd3,0x293829,1.7));const sun=new THREE.DirectionalLight(0xfff0c2,2.1);sun.position.set(25,40,15);sun.castShadow=true;scene.add(sun);
+const terrain=new THREE.Mesh(new THREE.PlaneGeometry(190,190,48,48),new THREE.MeshStandardMaterial({color:0x385235,roughness:1}));terrain.rotation.x=-Math.PI/2;terrain.receiveShadow=true;scene.add(terrain);
+for(let i=0;i<110;i++)tree((Math.random()-.5)*160,(Math.random()-.5)*145);
+for(let i=0;i<45;i++)rock((Math.random()-.5)*150,(Math.random()-.5)*135);
+player=makePlayer();scene.add(player);dog=makeDog();scene.add(dog);animal=makeAnimal();animal.visible=false;scene.add(animal);
+resize();addTouch();animate();
+}catch(e){document.getElementById("field").innerHTML='<div class="err"><div class="box"><h2>وضع التوافق</h2><p class="muted">تعذر تشغيل WebGL على هذا الجهاز/المتصفح. اللعبة تحتاج متصفحًا يدعم WebGL حتى تعمل 3D.</p></div></div>'}
 }
-function makeTree(x,z){const g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.15,.23,2.2,7),new THREE.MeshStandardMaterial({color:0x5b4028}));trunk.position.y=1.1;trunk.castShadow=true;g.add(trunk);const top=new THREE.Mesh(new THREE.ConeGeometry(1.2,2.8,8),new THREE.MeshStandardMaterial({color:0x234323}));top.position.y=3;top.castShadow=true;g.add(top);g.position.set(x,0,z);scene.add(g)}
-function makeRocks(){for(let i=0;i<35;i++){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.35+Math.random()*.6,0),new THREE.MeshStandardMaterial({color:0x626858,roughness:1}));m.position.set((Math.random()-.5)*140,.3,(Math.random()-.5)*120);m.rotation.set(Math.random(),Math.random(),Math.random());scene.add(m)}}
-function makeDog(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x5a3420});const body=new THREE.Mesh(new THREE.BoxGeometry(1.2,.7,.55),mat);body.position.y=.8;g.add(body);const head=new THREE.Mesh(new THREE.BoxGeometry(.55,.5,.5),mat);head.position.set(.75,1.05,0);g.add(head);for(const x of [-.4,.4])for(const z of [-.2,.2]){const l=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,.55,6),mat);l.position.set(x,.4,z);g.add(l)}g.position.set(1,0,1);return g}
-function makePrey(){const g=new THREE.Group();const mat=new THREE.MeshStandardMaterial({color:0x8f8050});const b=new THREE.Mesh(new THREE.SphereGeometry(.38,12,8),mat);b.scale.set(1.5,.9,1);b.position.y=.7;g.add(b);const h=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),mat);h.position.set(.55,.85,0);g.add(h);g.position.set(-4,0,-10);return g}
-function resetField(){if(dog){dog.position.set(1,0,1);dog.rotation.y=0}if(player){player.position.set(0,0,4)}if(preyObj){preyObj.visible=false}}
-function animate(){
-requestAnimationFrame(animate);
-if(tripActive&&tripStartedAt&&Date.now()-tripStartedAt>2700000){document.getElementById("returnBtn").style.display="block";document.getElementById("log").textContent="مر وقت طويل في الميدان. يُفضّل العودة قبل حلول الليل."}
-movePlayer();
-updateEnvironment();
-if(dog){
-const dx=cam.position.x+.8-dog.position.x,dz=cam.position.z+1.2-dog.position.z;
-dog.position.x+=dx*.035;dog.position.z+=dz*.035;
-dog.rotation.y=Math.atan2(dx,dz);
-}
-if(preyObj&&preyObj.visible){
-const dx=preyObj.position.x-animalTarget.x,dz=preyObj.position.z-animalTarget.z;
-if(Math.hypot(dx,dz)<1){animalTarget.x=(Math.random()-.5)*45;animalTarget.z=(Math.random()-.5)*45}
-preyObj.position.x+=(animalTarget.x-preyObj.position.x)*.003;
-preyObj.position.z+=(animalTarget.z-preyObj.position.z)*.003;
-preyObj.rotation.y=Math.atan2(animalTarget.x-preyObj.position.x,animalTarget.z-preyObj.position.z);
-}
-renderer.render(scene,cam)
-}
-function movePlayer(){
-const speed=.11;let f=0,s=0;
-if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)s=-1;if(keys.d||keys.ArrowRight)s=1;
-f+=-moveInput.y;s+=moveInput.x;
-const moving=Math.abs(f)+Math.abs(s)>.08;
-if(moving&&tripActive){cam.translateZ(-f*speed);cam.translateX(s*speed);cam.position.y=2.1;if(player){player.position.x=cam.position.x;player.position.z=cam.position.z+3.8;player.rotation.y=cam.rotation.y}const now=performance.now();if(now-lastStep>650){lastStep=now;document.getElementById("log").textContent="خطوات الصياد تتغير مع سرعة الحركة…"}}
-}
+function tree(x,z){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.CylinderGeometry(.13,.22,2.2,7),new THREE.MeshStandardMaterial({color:0x5a3d28}));t.position.y=1.1;g.add(t);const c=new THREE.Mesh(new THREE.ConeGeometry(1.15,2.9,9),new THREE.MeshStandardMaterial({color:0x1f4326}));c.position.y=3;g.add(c);g.position.set(x,0,z);g.traverse(o=>o.castShadow=true);scene.add(g)}
+function rock(x,z){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.3+Math.random()*.7),new THREE.MeshStandardMaterial({color:0x626b5d,roughness:1}));m.position.set(x,.35,z);scene.add(m)}
+function makePlayer(){const g=new THREE.Group(),mat=new THREE.MeshStandardMaterial({color:0x354837}),skin=new THREE.MeshStandardMaterial({color:0xb98266});let b=new THREE.Mesh(new THREE.BoxGeometry(.7,1,.4),mat);b.position.y=1.05;g.add(b);let h=new THREE.Mesh(new THREE.SphereGeometry(.23,12,10),skin);h.position.y=1.78;g.add(h);for(const x of[-.2,.2]){let l=new THREE.Mesh(new THREE.BoxGeometry(.17,.72,.2),new THREE.MeshStandardMaterial({color:0x202721}));l.position.set(x,.36,0);g.add(l)}return g}
+function makeDog(){const g=new THREE.Group(),m=new THREE.MeshStandardMaterial({color:0x633b24});let b=new THREE.Mesh(new THREE.BoxGeometry(1.2,.65,.55),m);b.position.y=.75;g.add(b);let h=new THREE.Mesh(new THREE.SphereGeometry(.28,10,8),m);h.position.set(.72,1.03,0);g.add(h);g.position.set(1,0,2);return g}
+function makeAnimal(){const g=new THREE.Group(),m=new THREE.MeshStandardMaterial({color:0x9b8a59});let b=new THREE.Mesh(new THREE.SphereGeometry(.42,12,9),m);b.scale.set(1.5,.85,1);b.position.y=.7;g.add(b);let h=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),m);h.position.set(.62,.86,0);g.add(h);g.position.set(-5,0,-12);return g}
+function resize(){if(!renderer)return;const w=document.getElementById("canvas").clientWidth,h=document.getElementById("canvas").clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();renderer.setSize(w,h,false)}window.addEventListener("resize",resize);
+function addTouch(){const j=document.getElementById("joy"),k=document.getElementById("knob");let on=false;j.style.display="block";j.addEventListener("pointerdown",e=>{on=true;j.setPointerCapture(e.pointerId);moveJoy(e)});j.addEventListener("pointermove",e=>{if(on)moveJoy(e)});j.addEventListener("pointerup",end);j.addEventListener("pointercancel",end);function moveJoy(e){const r=j.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),m=Math.min(40,Math.hypot(dx,dy)),a=Math.atan2(dy,dx);joy.x=Math.cos(a)*(m/40);joy.y=Math.sin(a)*(m/40);k.style.transform="translate("+joy.x*30+"px,"+joy.y*30+"px)"}function end(){on=false;joy.x=joy.y=0;k.style.transform="translate(0,0)"}}
 window.addEventListener("keydown",e=>keys[e.key]=true);window.addEventListener("keyup",e=>keys[e.key]=false);
-function resize(){const w=document.getElementById("canvasWrap").clientWidth,h=document.getElementById("canvasWrap").clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();renderer.setSize(w,h)}
-function dogCommand(c){
-if(!state.region||!state.area){toast("حدد منطقة الرحلة أولًا");view("tripView","n-trip");return}
-if(c==="ابحث"){hunt.tracking+=20;document.getElementById("log").textContent=state.dog+" بدأ البحث في "+state.area+".";dog.position.x+=.6}
-if(c==="تتبع"){hunt.tracking+=30;document.getElementById("log").textContent=state.dog+" يتتبع أثرًا في الميدان.";dog.position.z-=1}
-if(c==="اذهب"){hunt.tracking+=10}
-if(c==="توقف"){document.getElementById("log").textContent=state.dog+" توقف."}
-if(c==="تعال"){document.getElementById("log").textContent=state.dog+" عاد إليك."}
-if(c==="ثبت"){if(hunt.tracking<50){document.getElementById("log").textContent="الكلب لم يثبت على الطريدة بعد.";return}discover()}
-hunt.tracking=Math.min(90,hunt.tracking)
-}
-function discover(){
-hunt.prey=prey[Math.floor(Math.random()*prey.length)];hunt.found=true;preyObj.visible=true;animalTarget.x=preyObj.position.x+(Math.random()-.5)*18;animalTarget.z=preyObj.position.z+(Math.random()-.5)*18;
-preyObj.position.set(cam.position.x-4,0,cam.position.z-12);animalTarget.x=preyObj.position.x+(Math.random()-.5)*18;animalTarget.z=preyObj.position.z+(Math.random()-.5)*18;
-document.getElementById("shootBtn").style.display="block";
-document.getElementById("log").textContent=state.dog+" ثبت على حركة قريبة. الطريدة تتحرك في الميدان ولا تظهر مسبقًا.";
-}
-function shoot(){if(!hunt.found)return;if((state.ammo||0)<=0){document.getElementById("log").textContent="انتهت الذخيرة.";return}state.ammo--;if(weapon){weapon.rotation.z=-.12;setTimeout(()=>weapon.rotation.z=0,100)}save();const dist=cam.position.distanceTo(preyObj.position);const chance=Math.max(.25,Math.min(.9,.72-dist*.025));if(Math.random()<chance){document.getElementById("log").textContent="تمت إصابة "+hunt.prey+" في "+state.area+".";state.coins+=hunt.prey==="غزال"?950:420;save();hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none"}else{document.getElementById("log").textContent="أخطأت الطريدة وهربت. على الكلب إعادة التتبع.";hunt.found=false;preyObj.visible=false;document.getElementById("shootBtn").style.display="none";hunt.tracking=0}}
-function applyWeather(){
-if(!scene)return;
-let c=weatherData?.current?.weather_code??0;
-const ov=document.getElementById("envOverlay");
-if(c>=51&&c<=82){scene.fog.color.set(0x778a75);if(ov)ov.style.background="repeating-linear-gradient(110deg,rgba(210,225,235,.10) 0 2px,transparent 2px 13px)"}
-else if(c>=1&&c<=3){scene.fog.color.set(0x879b84);if(ov)ov.style.background="radial-gradient(circle at 50% 20%,rgba(235,235,225,.15),transparent 55%)"}
-else{scene.fog.color.set(0x91a77f)}
-}
-function renderDogs(){const b=document.getElementById("dogs");b.innerHTML="";dogNames.forEach((n,i)=>{const x=document.createElement("button");x.textContent=(state.dog===n?"✓ ":"")+"🐕 "+n;x.onclick=()=>{state.dog=n;save();renderDogs();toast("تم اختيار "+n)};b.appendChild(x)})}
-function renderGear(){document.getElementById("gear").innerHTML=["بندقية أساسية","ذخيرة","ماء","طعام الصياد","طعام الكلب"].map(x=>"<div class='panel'><b>🎒 "+x+"</b><p class='muted'>تجهيز ميداني</p></div>").join("")}
-buildRegions();renderDogs();renderGear();updatePlace();save();init3D();initTouchControls();startAmbient();if(state.region)fetchWeather();
+function animate(){requestAnimationFrame(animate);let f=0,x=0;if(keys.w||keys.ArrowUp)f=1;if(keys.s||keys.ArrowDown)f=-1;if(keys.a||keys.ArrowLeft)x=-1;if(keys.d||keys.ArrowRight)x=1;f-=joy.y;x+=joy.x;if(active){cam.translateZ(-f*.11);cam.translateX(x*.11);player.position.set(cam.position.x,0,cam.position.z+3.8);player.rotation.y=cam.rotation.y;dog.position.x+=(cam.position.x+1-dog.position.x)*.04;dog.position.z+=(cam.position.z+1.7-dog.position.z)*.04}if(animal.visible){animal.position.x+=(animalTarget.x-animal.position.x)*.003;animal.position.z+=(animalTarget.z-animal.position.z)*.003}renderer.render(scene,cam)}
+function startTrip(){if(!s.region||!s.area){toast("حدد المحافظة والمنطقة أولًا");show("tripView","navTrip");return}active=true;tracking=0;found=false;animal.visible=false;updatePlace();document.getElementById("msg").textContent="بدأت الرحلة. راقب الأرض واتبع إشارات الكلب.";show("fieldView","navField")}
+function dogCmd(c){if(!active){toast("ابدأ الرحلة أولًا");return}if(c==="ابحث"){tracking+=20;document.getElementById("msg").textContent=s.dog+" بدأ البحث عن أثر."}if(c==="تتبع"){tracking+=30;document.getElementById("msg").textContent=s.dog+" يتتبع الأثر."}if(c==="ثبت"){if(tracking<50){document.getElementById("msg").textContent="لم يثبت الكلب على الطريدة بعد.";return}found=true;animal.visible=true;animal.position.set(cam.position.x-4,0,cam.position.z-12);animalTarget.x=animal.position.x+(Math.random()-.5)*20;animalTarget.z=animal.position.z+(Math.random()-.5)*20;document.getElementById("msg").textContent=s.dog+" ثبت على طريدة. نوعها سيظهر بعد الاكتشاف."}if(c==="توقف")document.getElementById("msg").textContent=s.dog+" توقف."}
+function fire(){if(!found){toast("لا توجد طريدة مكتشفة");return}const name=prey[Math.floor(Math.random()*prey.length)];s.coins+=name==="غزال"?950:420;save();found=false;animal.visible=false;document.getElementById("msg").textContent="تمت إصابة "+name+" بنجاح. عُد إلى الرحلة لحفظ النتيجة."}
+renderPlaces();renderDogs();updatePlace();save();init3D();if(s.region)loadWeather();
 </script>
-</body>
-</html>
+</body></html>
