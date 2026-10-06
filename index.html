@@ -75,6 +75,14 @@ const dogs=["ماكس","جاك","بلاك","أطلس","سرحانة"];
 const prey=["حجل","حمام بري","أرنب بري","غزال","ثعلب","ذئب"];
 let s=JSON.parse(localStorage.getItem("journeyHuntPro")||"null")||{coins:1000,region:"",area:"",dog:"ماكس"};
 let scene,cam,renderer,clock3d,dog,animal,player,keys={},joy={x:0,y:0},tracking=0,found=false,active=false,animalTarget={x:0,z:0},weatherCode=0,localTZ="auto",sunLight,cinTimer=null;\nlet ammo=7,stamina=100;
+window.__huntState={
+  get state(){return s;},
+  get found(){return found;}, set found(v){found=v;},
+  get active(){return active;},
+  get tracking(){return tracking;},
+  get ammo(){return ammo;}, set ammo(v){ammo=v;},
+  get prey(){return prey;}
+};
 
 function save(){localStorage.setItem("journeyHuntPro",JSON.stringify(s));document.getElementById("coins").textContent=s.coins}
 function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",1500)}
