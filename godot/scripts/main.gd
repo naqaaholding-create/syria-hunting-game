@@ -159,10 +159,14 @@ func _create_camera() -> void:
 func _move_player(delta: float) -> void:
     if not player:
         return
-    var keyboard := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+    var keyboard := Vector2.ZERO
+    if Input.is_key_pressed(KEY_A): keyboard.x -= 1.0
+    if Input.is_key_pressed(KEY_D): keyboard.x += 1.0
+    if Input.is_key_pressed(KEY_W): keyboard.y -= 1.0
+    if Input.is_key_pressed(KEY_S): keyboard.y += 1.0
     var input_dir := move_vector
     if keyboard.length() > 0.05:
-        input_dir = keyboard
+        input_dir = keyboard.normalized()
     var direction := Vector3(input_dir.x, 0, input_dir.y)
     player.velocity = direction * 5.2
     player.move_and_slide()
@@ -209,6 +213,7 @@ func _build_ui() -> void:
     box.add_child(governorate)
 
     area_option = OptionButton.new()
+    area_option.item_selected.connect(_on_area_selected)
     box.add_child(area_option)
 
     status_label = Label.new()
@@ -265,7 +270,7 @@ func _update_area_options() -> void:
     for area in list:
         area_option.add_item(area)
     selected_area = str(list[0])
-    area_option.item_selected.connect(_on_area_selected)
+    area_option.select(0)
 
 func _on_area_selected(index: int) -> void:
     selected_area = area_option.get_item_text(index)
