@@ -119,6 +119,10 @@ function wildlifeForArea(){const m={"ذيبين":["حجل","أرنب بري","ح
 
 function resetJourneyData(){try{localStorage.removeItem('journeyHuntPro');localStorage.removeItem('journeyFieldPos');location.reload();}catch(e){}}
 
+
+function bindJourneyAutosave(){document.addEventListener('click',e=>{if(e.target.closest('.region,.area,.dog,.governorate'))setTimeout(saveJourneyState,50);});}
+bindJourneyAutosave();
+
 function saveJourneyState(){try{localStorage.setItem('journeyHuntPro',JSON.stringify({region:s.region,area:s.area,dog:s.dog,ammo:ammo,stamina:stamina,coins:s.coins||0}));}catch(e){}}
 function loadJourneyState(){try{const v=JSON.parse(localStorage.getItem('journeyHuntPro')||'null');if(!v)return;if(v.region)s.region=v.region;if(v.area)s.area=v.area;if(v.dog)s.dog=v.dog;if(Number.isFinite(v.coins))s.coins=v.coins;}catch(e){}}
 
