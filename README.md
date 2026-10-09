@@ -23,6 +23,8 @@
 - [تصميم النظام المالي](docs/FINANCIAL_SYSTEM.md).
 - [خطة SafePal + USDT على TRON](docs/SAFEPAL_TRON_USDT_INTEGRATION.md).
 - [مخطط قاعدة البيانات المالية](backend/schema/financial_schema.sql).
+- [بداية بناء الخادم المالي وخطوات التشغيل](docs/FINANCIAL_BACKEND_BUILD.md).
+- [مصدر خادم API المالي](backend/src/server.js) — المسارات المالية مغلقة حتى استكمال المصادقة والدفتر المالي.
 
 ## مراحل لاحقة
 1. تحسين التضاريس والبيئات الإقليمية.
