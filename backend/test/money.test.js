@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { decimalToCents, centsToDecimal, playerPoolCents } = require('../src/money');
+const { decimalToCents, centsToDecimal, playerPoolCents, allocateRewardPool } = require('../src/money');
 
 test('converts decimal strings to integer cents without floating point', () => {
   assert.equal(decimalToCents('12.50'), 1250);
@@ -26,4 +26,30 @@ test('player reward pool is 20 percent of eligible revenue collectively', () => 
 test('reward pool rejects negative or fractional cents', () => {
   assert.throws(() => playerPoolCents(-1));
   assert.throws(() => playerPoolCents(10.5));
+});
+
+test('reward allocation distributes exact pool cents proportionally and deterministically', () => {
+  const result = allocateRewardPool(10, [
+    { userId: 'b', points: 1 },
+    { userId: 'a', points: 1 },
+    { userId: 'c', points: 1 }
+  ]);
+  assert.equal(result.reduce((sum, p) => sum + p.rewardCents, 0), 10);
+  assert.deepEqual(result, [
+    { userId: 'b', rewardCents: 3 },
+    { userId: 'a', rewardCents: 4 },
+    { userId: 'c', rewardCents: 3 }
+  ]);
+});
+
+test('zero eligible points do not distribute the pool', () => {
+  assert.deepEqual(allocateRewardPool(100, [{ userId: 'a', points: 0 }]), [
+    { userId: 'a', rewardCents: 0 }
+  ]);
+});
+
+test('reward allocation rejects duplicate players', () => {
+  assert.throws(() => allocateRewardPool(10, [
+    { userId: 'a', points: 1 }, { userId: 'a', points: 2 }
+  ]));
 });
