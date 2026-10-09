@@ -24,6 +24,8 @@
 - [خطة SafePal + USDT على TRON](docs/SAFEPAL_TRON_USDT_INTEGRATION.md).
 - [مخطط قاعدة البيانات المالية](backend/schema/financial_schema.sql).
 - [بداية بناء الخادم المالي وخطوات التشغيل](docs/FINANCIAL_BACKEND_BUILD.md).
+- [ترحيل المصادقة وتتبع أحداث TRON وحماية دفتر الأستاذ](docs/FINANCIAL_MIGRATION_002.md).
+- [ترحيل حسابات دفتر الأستاذ النظامية](docs/FINANCIAL_MIGRATION_003.md).
 - [مصدر خادم API المالي](backend/src/server.js) — المسارات المالية مغلقة حتى استكمال المصادقة والدفتر المالي.
 
 ## مراحل لاحقة
