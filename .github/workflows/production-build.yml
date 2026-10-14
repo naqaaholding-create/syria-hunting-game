@@ -1,0 +1,30 @@
+name: Production build validation
+on:
+  push:
+    branches: [main, "fix/**"]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: production-build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  financial-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Syntax check
+        run: npm run check
+      - name: Unit tests
+        run: npm test
+      - name: Verify real-money routes remain gated
+        run: node -e "const fs=require('fs');const s=fs.readFileSync('src/server.js','utf8');for(const p of ['/api/v1/deposits/quote','/api/v1/withdrawals'])if(!s.includes(p))process.exit(1);if(!s.includes('WITHDRAWALS_DISABLED')||!s.includes('DEPOSITS_DISABLED'))process.exit(1)"
